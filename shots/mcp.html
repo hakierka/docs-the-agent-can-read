@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pail MCP — selftest</title>
+<style>
+  :root { --bg:#190B33; --ink:#FFF6EC; --muted:#BBA9DD; --pink:#FF2E88; --ok:#3DDC97; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font: 14px/1.45 ui-monospace, Menlo, monospace; padding:28px 32px; width:920px; }
+  h1 { font: 700 22px/1.2 ui-monospace, Menlo, monospace; margin:0 0 6px; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .cmd { color:var(--pink); margin:18px 0 8px; }
+  pre { margin:0; background:#120824; border:2px solid #FFF6EC; padding:12px 14px; white-space:pre-wrap; }
+  .ok { color:var(--ok); }
+  ul { margin:8px 0 0; padding-left:18px; color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>pail · mcp_pail.py --selftest</h1>
+<p class="sub">fake object store. stdio MCP, no SDK. text blobs in memory.</p>
+<p class="cmd">$ python3 mcp_pail.py --list</p>
+<ul>
+  <li>pail_whoami</li>
+  <li>pail_list_spaces</li>
+  <li>pail_put / pail_get</li>
+  <li>pail_explain_error</li>
+</ul>
+<p class="cmd">$ python3 mcp_pail.py --selftest</p>
+<pre>
+<span class="ok">put</span>  {"space":"space_cats","name":"note.txt","etag":"0x13","bytes":2}
+<span class="ok">get</span>  {"space":"space_cats","name":"note.txt","bytes":2,"text":"hi"}
+<span class="ok">miss</span> {"error":{"code":"object_missing","http":404}}
+<span class="ok">acl</span>  {"code":"space_forbidden","http":403,"message":"key is valid, space is not on it"}
+</pre>
+</body>
+</html>
