@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>errors.md</title>
+<style>
+  body{margin:0;background:#190B33;color:#FFF6EC;font:14px/1.4 ui-monospace,Menlo,monospace;padding:28px 32px;width:920px}
+  h1{font-size:20px;margin:0 0 6px}
+  .sub{color:#BBA9DD;margin:0 0 14px}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;color:#BBA9DD;font-weight:400;padding:0 8px 8px;border-bottom:2px solid #2B59FF}
+  td{padding:8px;border-bottom:1px solid #3a2460}
+  .c{color:#FF2E88}
+</style>
+</head>
+<body>
+<h1>docs/errors.md · the page agents should read</h1>
+<p class="sub">{"error":{"code":"object_missing","message":"…"}}. parse code, not message.</p>
+<table>
+<tr><th>code</th><th>http</th><th>when</th></tr>
+<tr><td class="c">bad_token</td><td>401</td><td>missing or garbage bearer</td></tr>
+<tr><td class="c">space_forbidden</td><td>403</td><td>key valid, space not on it</td></tr>
+<tr><td class="c">object_missing</td><td>404</td><td>space exists, name does not</td></tr>
+<tr><td class="c">payload_too_big</td><td>413</td><td>&gt; 8MB in this fake</td></tr>
+<tr><td class="c">name_invalid</td><td>400</td><td>empty name, or a newline, because someone will try</td></tr>
+</table>
+</body>
+</html>

@@ -37,6 +37,8 @@ There is no hosted pail. The server keeps two spaces in memory and pretends you 
 
 ![MCP selftest: put, get, missing object, forbidden space](shots/mcp.png)
 
+![Error catalogue from docs/errors.md](shots/errors.png)
+
 ## opinion
 
 If your docs need a chrome extension to be useful, the page is wrong. If your MCP tool is `search_docs` wrapping the blog, the tool is wrong. Put the error codes in a file and let both humans and models read the same file.
