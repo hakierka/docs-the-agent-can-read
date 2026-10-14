@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: pail
+  version: "0.1"
+  description: Fake object store. See docs/quickstart.md.
+servers:
+  - url: https://api.pail.example
+paths:
+  /v1/spaces/{spaceId}/objects/{name}:
+    put:
+      operationId: putObject
+      parameters:
+        - $ref: "#/components/parameters/spaceId"
+        - $ref: "#/components/parameters/name"
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PutResult"
+        "400":
+          $ref: "#/components/responses/Err"
+        "401":
+          $ref: "#/components/responses/Err"
+        "403":
+          $ref: "#/components/responses/Err"
+        "413":
+          $ref: "#/components/responses/Err"
+    get:
+      operationId: getObject
+      parameters:
+        - $ref: "#/components/parameters/spaceId"
+        - $ref: "#/components/parameters/name"
+      security:
+        - bearer: []
+      responses:
+        "200":
+          description: bytes
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Err"
+        "403":
+          $ref: "#/components/responses/Err"
+        "404":
+          $ref: "#/components/responses/Err"
+  /v1/spaces:
+    get:
+      operationId: listSpaces
+      security:
+        - bearer: []
+      responses:
+        "200":
+          description: spaces this key can see
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaceList"
+        "401":
+          $ref: "#/components/responses/Err"
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+  parameters:
+    spaceId:
+      name: spaceId
+      in: path
+      required: true
+      schema:
+        type: string
+    name:
+      name: name
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    PutResult:
+      type: object
+      properties:
+        space:
+          type: string
+        name:
+          type: string
+        etag:
+          type: string
+        bytes:
+          type: integer
+    SpaceList:
+      type: object
+      properties:
+        spaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              objects:
+                type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+  responses:
+    Err:
+      description: see docs/errors.md
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

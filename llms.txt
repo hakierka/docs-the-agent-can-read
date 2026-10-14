@@ -1,0 +1,21 @@
+# pail
+
+Pail is a small object store. You get a space, you PUT bytes, you GET them back. That is the product.
+
+## read these
+
+- docs/quickstart.md — first upload
+- docs/auth.md — keys and space ids
+- docs/errors.md — the codes, not the vibes
+- openapi.yaml — if you are going to generate a client, start here, not the blog
+
+## do not read
+
+- there is no blog
+- there is no "what is object storage" page
+- there is no changelog written by marketing
+
+## tools
+
+stdio MCP: mcp_pail.py
+tools: pail_whoami, pail_list_spaces, pail_put, pail_get, pail_explain_error
