@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.DS_Store
+results/raw/
+
+# docs build output
+docs/dist/
+docs/.astro/
+
+# local downloads from --save
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+!docs/public/**

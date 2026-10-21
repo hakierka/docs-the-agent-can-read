@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs/package-lock.json
+
+      - name: Install CLI deps
+        run: npm ci
+
+      - name: Build CLI
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Install docs deps
+        run: npm ci --prefix docs
+
+      - name: Build docs
+        run: npm run docs:build
+
+      - name: Link check
+        run: npm run docs:check-links
