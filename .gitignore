@@ -4,6 +4,7 @@ dist/
 .DS_Store
 results/raw/
 results/dry-run/
+results/smoke*/
 
 # docs build output
 docs/dist/

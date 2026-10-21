@@ -23,6 +23,7 @@ const sampleAttempt = (): AttemptRecord => ({
   outcome: "pass",
   pass: true,
   failureReason: null,
+  finishReason: null,
   inputTokens: 1,
   outputTokens: 1,
   thinkingTokens: null,

@@ -4,6 +4,8 @@ export type ProviderName = "anthropic" | "google" | "stub";
 
 export type ProviderCompleteResult = ModelCompleteResult & {
   thinkingTokens?: number | null;
+  /** Google finishReason when available; null for stub/Anthropic. */
+  finishReason?: string | null;
 };
 
 export type EvalProvider = {
@@ -30,6 +32,16 @@ export class HttpStatusError extends Error {
   }
 }
 
+/** Non-STOP finishReason or empty text — always scored as outcome "error", never "fail". */
+export class CompletionQualityError extends Error {
+  readonly finishReason: string | null;
+  constructor(message: string, finishReason: string | null) {
+    super(message);
+    this.name = "CompletionQualityError";
+    this.finishReason = finishReason;
+  }
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -43,6 +55,49 @@ export function isRateLimitError(err: unknown): boolean {
   }
   const msg = err instanceof Error ? err.message : String(err);
   return /\b429\b|RESOURCE_EXHAUSTED|rate.?limit/i.test(msg);
+}
+
+/**
+ * Empty text → error. When finishReason is present, anything other than STOP → error.
+ * Missing finishReason (stub/Anthropic) is allowed if text is non-empty.
+ */
+export function assertUsableCompletion(
+  text: string,
+  finishReason: string | null | undefined,
+): void {
+  const fr = finishReason ?? null;
+  if (!text.trim()) {
+    throw new CompletionQualityError(
+      `empty model text (finishReason=${fr ?? "unknown"})`,
+      fr,
+    );
+  }
+  if (fr != null && fr !== "STOP") {
+    throw new CompletionQualityError(`finishReason=${fr} (expected STOP)`, fr);
+  }
+}
+
+/** Pure helper for tests: fake Google-shaped response → usable completion or throw. */
+export function interpretGoogleResponse(response: {
+  text?: string | null;
+  candidates?: Array<{ finishReason?: string | null } | undefined> | null;
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    thoughtsTokenCount?: number;
+  } | null;
+}): ProviderCompleteResult {
+  const finishReason = response.candidates?.[0]?.finishReason ?? null;
+  const text = response.text ?? "";
+  assertUsableCompletion(text, finishReason);
+  const usage = response.usageMetadata;
+  return {
+    text,
+    inputTokens: usage?.promptTokenCount ?? 0,
+    outputTokens: usage?.candidatesTokenCount ?? 0,
+    thinkingTokens: usage?.thoughtsTokenCount ?? null,
+    finishReason,
+  };
 }
 
 /**
@@ -115,7 +170,8 @@ export function wrapModelClient(
     modelId: client.id,
     thinkingSetting,
     async complete(system, user) {
-      return client.complete(system, user);
+      const r = await client.complete(system, user);
+      return { ...r, finishReason: null };
     },
   };
 }
@@ -140,6 +196,7 @@ export async function createGoogleProvider(
           contents: user,
           config: {
             temperature,
+            maxOutputTokens: 512,
             systemInstruction: system,
             thinkingConfig: {
               // Cap thinking for lite eval runs (MINIMAL ≈ "no thinking" for most queries).
@@ -148,15 +205,15 @@ export async function createGoogleProvider(
             },
           },
         });
-        const text = response.text ?? "";
-        const usage = response.usageMetadata;
-        return {
-          text,
-          inputTokens: usage?.promptTokenCount ?? 0,
-          outputTokens: usage?.candidatesTokenCount ?? 0,
-          thinkingTokens: usage?.thoughtsTokenCount ?? null,
-        };
+        return interpretGoogleResponse({
+          text: response.text,
+          candidates: response.candidates?.map((c) => ({
+            finishReason: c.finishReason != null ? String(c.finishReason) : null,
+          })),
+          usageMetadata: response.usageMetadata,
+        });
       } catch (err) {
+        if (err instanceof CompletionQualityError) throw err;
         if (isRateLimitError(err)) {
           throw new HttpStatusError(429, err instanceof Error ? err.message : String(err));
         }

@@ -50,6 +50,7 @@ describe("scoring + stub rendering", () => {
         outcome: scored.ok ? ("pass" as const) : ("fail" as const),
         pass: scored.ok,
         failureReason: scored.ok ? null : scored.reason,
+        finishReason: null,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
         thinkingTokens: null,

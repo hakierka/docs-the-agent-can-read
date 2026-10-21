@@ -13,6 +13,7 @@ import {
 } from "./model.js";
 import {
   completeWithRetry,
+  CompletionQualityError,
   createGoogleProvider,
   requireProviderApiKey,
   sleep,
@@ -22,6 +23,10 @@ import {
 } from "./provider.js";
 import {
   buildAggregate,
+  CIRCUIT_BREAKER_LIMIT,
+  INCOMPLETE_BANNER,
+  nextConsecutiveErrors,
+  redactSecrets,
   resolveOutputDirs,
   writeAggregates,
   writeRawAttempt,
@@ -29,14 +34,15 @@ import {
   type AttemptOutcome,
 } from "./results.js";
 import { scoreModelOutput } from "./score.js";
-import { loadTasks } from "./tasks.js";
+import { loadTasks, parseTaskIds, selectTasks } from "./tasks.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EVAL_ROOT = join(__dirname, "..");
 const REPO_ROOT = join(EVAL_ROOT, "..");
 
 const DEFAULT_HARD_CAP = 50;
-const DEFAULT_DELAY_MS = 2000;
+/** Default pause between live API calls (`--delay-ms`). */
+export const DEFAULT_DELAY_MS = 2000;
 const DEFAULT_GOOGLE_MODEL = "gemini-3.5-flash-lite";
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-5-5";
 
@@ -52,6 +58,7 @@ type CliOptions = {
   delayMs: number;
   thinkingLevel: string;
   yes: boolean;
+  taskIds: string[] | null;
 };
 
 function parseCli(argv: string[]): CliOptions {
@@ -69,6 +76,7 @@ function parseCli(argv: string[]): CliOptions {
     delayMs: DEFAULT_DELAY_MS,
     thinkingLevel: "minimal",
     yes: false,
+    taskIds: null,
   };
 
   for (let i = 2; i < argv.length; i++) {
@@ -126,6 +134,10 @@ function parseCli(argv: string[]): CliOptions {
       opts.thinkingLevel = argv[++i]!;
       continue;
     }
+    if (a === "--tasks") {
+      opts.taskIds = parseTaskIds(argv[++i]!);
+      continue;
+    }
     throw new Error(`unknown option: ${a}`);
   }
 
@@ -145,7 +157,9 @@ async function confirm(message: string): Promise<boolean> {
   }
 }
 
-async function createLiveProvider(opts: CliOptions): Promise<EvalProvider> {
+async function createLiveProvider(
+  opts: CliOptions,
+): Promise<{ provider: EvalProvider; apiKey: string }> {
   const liveName: ProviderName = opts.provider === "google" ? "google" : "anthropic";
   const checked = requireProviderApiKey(liveName);
   if (!checked.ok) {
@@ -154,10 +168,22 @@ async function createLiveProvider(opts: CliOptions): Promise<EvalProvider> {
   }
 
   if (liveName === "google") {
-    return createGoogleProvider(opts.model, opts.temperature, checked.key, opts.thinkingLevel);
+    return {
+      provider: await createGoogleProvider(
+        opts.model,
+        opts.temperature,
+        checked.key,
+        opts.thinkingLevel,
+      ),
+      apiKey: checked.key,
+    };
   }
   const anthropic = await createAnthropicModel(opts.model, opts.temperature, checked.key);
-  return wrapModelClient("anthropic", anthropic, null);
+  return { provider: wrapModelClient("anthropic", anthropic, null), apiKey: checked.key };
+}
+
+function safeLog(line: string, secrets: string[]): void {
+  console.log(redactSecrets(line, secrets));
 }
 
 async function main(): Promise<void> {
@@ -168,7 +194,17 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
-  const tasks = await loadTasks(join(EVAL_ROOT, "tasks.json"));
+  const allTasks = await loadTasks(join(EVAL_ROOT, "tasks.json"));
+  const selected = selectTasks(allTasks, {
+    label: opts.label,
+    dryRun: opts.dryRun,
+    taskIds: opts.taskIds,
+  });
+  if (!selected.ok) {
+    console.error(selected.reason);
+    process.exit(2);
+  }
+  const tasks = selected.tasks;
   const plannedCalls = tasks.length * opts.runs;
 
   if (plannedCalls > opts.hardCap) {
@@ -190,10 +226,28 @@ async function main(): Promise<void> {
   const estOut = approxOutPerCall * plannedCalls;
   const estCost = estimateCostUsd(pricing, opts.model, estIn, estOut);
 
+  let secrets: string[] = [];
+  let provider: EvalProvider;
+  if (opts.dryRun) {
+    provider = wrapModelClient("stub", createStubModel(), null);
+  } else {
+    // --yes skips the interactive confirm; without it, type y at the prompt.
+    if (!opts.yes) {
+      const ok = await confirm("Type y to proceed with live API calls: ");
+      if (!ok) {
+        console.error("aborted");
+        process.exit(1);
+      }
+    }
+    const live = await createLiveProvider(opts);
+    provider = live.provider;
+    secrets = live.apiKey ? [live.apiKey] : [];
+  }
+
   console.log(`Provider: ${opts.dryRun ? "stub" : opts.provider}`);
   console.log(`Model: ${opts.dryRun ? "stub-dry-run" : opts.model}`);
   console.log(`Planned calls: ${plannedCalls} (${tasks.length} tasks × ${opts.runs} runs)`);
-  console.log(`Delay between calls: ${opts.dryRun ? 0 : opts.delayMs}ms`);
+  console.log(`Delay between calls (--delay-ms): ${opts.dryRun ? 0 : opts.delayMs}ms`);
   console.log(`Estimated tokens: ~${estIn} input / ~${estOut} output`);
   console.log(
     `Estimated cost (from pricing.json): ${
@@ -204,20 +258,6 @@ async function main(): Promise<void> {
   console.log(`Label: ${opts.label}`);
   console.log(`System prompt hash: ${systemPromptHash}`);
 
-  let provider: EvalProvider;
-  if (opts.dryRun) {
-    provider = wrapModelClient("stub", createStubModel(), null);
-  } else {
-    if (!opts.yes) {
-      const ok = await confirm("Type y to proceed with live API calls: ");
-      if (!ok) {
-        console.error("aborted");
-        process.exit(1);
-      }
-    }
-    provider = await createLiveProvider(opts);
-  }
-
   const out = resolveOutputDirs(REPO_ROOT, { dryRun: opts.dryRun, label: opts.label });
   if (!out.ok) {
     console.error(out.reason);
@@ -227,11 +267,13 @@ async function main(): Promise<void> {
 
   const attempts: AttemptRecord[] = [];
   const delayMs = opts.dryRun ? 0 : opts.delayMs;
+  let consecutiveErrors = 0;
+  let stoppedEarly = false;
 
   // Tasks and runs must be sequential: checkCommand uses process.chdir (process-global).
   // Do not fan out tasks or runs in parallel. Live calls also wait delayMs between calls.
   let callIndex = 0;
-  for (const task of tasks) {
+  outer: for (const task of tasks) {
     for (let run = 1; run <= opts.runs; run++) {
       if (callIndex > 0 && delayMs > 0) {
         await sleep(delayMs);
@@ -242,6 +284,7 @@ async function main(): Promise<void> {
       let outcome: AttemptOutcome;
       let rawText = "";
       let failureReason: string | null = null;
+      let finishReason: string | null = null;
       let inputTokens = 0;
       let outputTokens = 0;
       let thinkingTokens: number | null = null;
@@ -249,11 +292,15 @@ async function main(): Promise<void> {
 
       try {
         const completed = await completeWithRetry(provider, systemPrompt, user);
-        retries = completed.retries;
+        retries = completed.retries.map((r) => ({
+          ...r,
+          message: redactSecrets(r.message, secrets),
+        }));
         rawText = completed.result.text;
         inputTokens = completed.result.inputTokens;
         outputTokens = completed.result.outputTokens;
         thinkingTokens = completed.result.thinkingTokens ?? null;
+        finishReason = completed.result.finishReason ?? null;
 
         const scored = await scoreModelOutput(task, rawText);
         if (scored.ok) {
@@ -266,7 +313,14 @@ async function main(): Promise<void> {
         outcome = "error";
         failureReason = err instanceof Error ? err.message : String(err);
         rawText = "";
+        if (err instanceof CompletionQualityError) {
+          finishReason = err.finishReason;
+        }
       }
+
+      failureReason =
+        failureReason == null ? null : redactSecrets(failureReason, secrets);
+      rawText = redactSecrets(rawText, secrets);
 
       const { usd, missingPrice } = estimateCostUsd(
         pricing,
@@ -287,6 +341,7 @@ async function main(): Promise<void> {
         outcome,
         pass: outcome === "pass",
         failureReason,
+        finishReason,
         inputTokens,
         outputTokens,
         thinkingTokens,
@@ -295,12 +350,23 @@ async function main(): Promise<void> {
         retries,
       };
       attempts.push(record);
-      await writeRawAttempt(rawDir, record, { stub });
-      console.log(
+      await writeRawAttempt(rawDir, record, { stub, secrets });
+      safeLog(
         `${task.id} run ${run}: ${outcome.toUpperCase()}${
           failureReason ? ` — ${failureReason}` : ""
         }${retries.length ? ` (retries: ${retries.length})` : ""}`,
+        secrets,
       );
+
+      consecutiveErrors = nextConsecutiveErrors(consecutiveErrors, outcome);
+      if (consecutiveErrors >= CIRCUIT_BREAKER_LIMIT) {
+        stoppedEarly = true;
+        safeLog(
+          `Circuit breaker: ${INCOMPLETE_BANNER}`,
+          secrets,
+        );
+        break outer;
+      }
     }
   }
 
@@ -316,13 +382,22 @@ async function main(): Promise<void> {
     opts.runs,
     attempts,
   );
+  if (stoppedEarly) {
+    aggregate.incomplete = true;
+    aggregate.incompleteReason = INCOMPLETE_BANNER;
+  }
   const { jsonPath, mdPath } = await writeAggregates(resultsDir, opts.label, aggregate, {
     stub,
+    incomplete: stoppedEarly,
+    secrets,
   });
-  console.log(`Wrote ${jsonPath}`);
-  console.log(`Wrote ${mdPath}`);
+  safeLog(`Wrote ${jsonPath}`, secrets);
+  safeLog(`Wrote ${mdPath}`, secrets);
   console.log(`Overall (errors excluded): ${aggregate.overallPassRate}`);
   console.log(`Errors: ${aggregate.overallErrors}`);
+  if (stoppedEarly) {
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {

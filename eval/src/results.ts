@@ -17,6 +17,7 @@ export type AttemptRecord = {
   /** True only when outcome === "pass". */
   pass: boolean;
   failureReason: string | null;
+  finishReason: string | null;
   inputTokens: number;
   outputTokens: number;
   thinkingTokens: number | null;
@@ -57,17 +58,26 @@ export type AggregateResult = {
   totalThinkingTokens: number;
   totalCostUsd: number | null;
   attempts: AttemptRecord[];
+  incomplete?: boolean;
+  incompleteReason?: string;
 };
 
 /** First line of every dry-run / stub artifact. */
 export const STUB_BANNER = "STUB - NOT REAL RESULTS";
+
+/** First line when the circuit breaker stops a live/stub run early. */
+export const INCOMPLETE_BANNER = "INCOMPLETE RUN (stopped after 3 consecutive errors)";
+
+export const CIRCUIT_BREAKER_LIMIT = 3;
 
 export type OutputDirs =
   | { ok: true; resultsDir: string; rawDir: string; stub: boolean }
   | { ok: false; reason: string };
 
 /**
- * Dry-run → results/dry-run/ (+ raw/). Live → results/ (+ raw/).
+ * Dry-run → results/dry-run/.
+ * Smoke labels (smoke*) → results/<label>/ (gitignored; never top-level baseline).
+ * Live → results/ (+ raw/).
  * Live runs may not use the label "dry-run".
  */
 export function resolveOutputDirs(
@@ -84,8 +94,31 @@ export function resolveOutputDirs(
     const resultsDir = join(repoRoot, "results", "dry-run");
     return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: true };
   }
+  if (options.label.startsWith("smoke")) {
+    const resultsDir = join(repoRoot, "results", options.label);
+    return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: false };
+  }
   const resultsDir = join(repoRoot, "results");
   return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: false };
+}
+
+/** Replace known secret values with [REDACTED]. */
+export function redactSecrets(text: string, secrets: string[]): string {
+  let out = text;
+  for (const secret of secrets) {
+    if (!secret || secret.length < 4) continue;
+    if (out.includes(secret)) {
+      out = out.split(secret).join("[REDACTED]");
+    }
+  }
+  return out;
+}
+
+export function nextConsecutiveErrors(
+  previous: number,
+  outcome: AttemptOutcome,
+): number {
+  return outcome === "error" ? previous + 1 : 0;
 }
 
 function assertNoKeyLeak(json: string): void {
@@ -94,16 +127,36 @@ function assertNoKeyLeak(json: string): void {
   }
 }
 
+function writePrefix(options: { stub?: boolean; incomplete?: boolean }): string {
+  const lines: string[] = [];
+  if (options.incomplete) lines.push(INCOMPLETE_BANNER);
+  if (options.stub) lines.push(STUB_BANNER);
+  return lines.length ? `${lines.join("\n")}\n` : "";
+}
+
 export async function writeRawAttempt(
   rawDir: string,
   record: AttemptRecord,
-  options: { stub?: boolean } = {},
+  options: { stub?: boolean; incomplete?: boolean; secrets?: string[] } = {},
 ): Promise<void> {
   await mkdir(rawDir, { recursive: true });
   const name = `${record.taskId}-run${record.run}-${Date.now()}.json`;
-  const json = JSON.stringify(record, null, 2) + "\n";
+  const secrets = options.secrets ?? [];
+  const redacted: AttemptRecord = {
+    ...record,
+    rawModelOutput: redactSecrets(record.rawModelOutput, secrets),
+    failureReason:
+      record.failureReason == null
+        ? null
+        : redactSecrets(record.failureReason, secrets),
+    retries: record.retries.map((r) => ({
+      ...r,
+      message: redactSecrets(r.message, secrets),
+    })),
+  };
+  const json = redactSecrets(JSON.stringify(redacted, null, 2) + "\n", secrets);
   assertNoKeyLeak(json);
-  const body = options.stub ? `${STUB_BANNER}\n${json}` : json;
+  const body = writePrefix(options) + json;
   await writeFile(join(rawDir, name), body, "utf8");
 }
 
@@ -111,15 +164,34 @@ export async function writeAggregates(
   resultsDir: string,
   label: string,
   aggregate: AggregateResult,
-  options: { stub?: boolean } = {},
+  options: { stub?: boolean; incomplete?: boolean; secrets?: string[] } = {},
 ): Promise<{ jsonPath: string; mdPath: string }> {
   await mkdir(resultsDir, { recursive: true });
   const jsonPath = join(resultsDir, `${label}.json`);
   const mdPath = join(resultsDir, `${label}.md`);
-  const json = JSON.stringify(aggregate, null, 2) + "\n";
+  const secrets = options.secrets ?? [];
+  const safeAgg: AggregateResult = {
+    ...aggregate,
+    incomplete: options.incomplete || aggregate.incomplete,
+    incompleteReason: options.incomplete
+      ? INCOMPLETE_BANNER
+      : aggregate.incompleteReason,
+    attempts: aggregate.attempts.map((a) => ({
+      ...a,
+      rawModelOutput: redactSecrets(a.rawModelOutput, secrets),
+      failureReason:
+        a.failureReason == null ? null : redactSecrets(a.failureReason, secrets),
+      retries: a.retries.map((r) => ({
+        ...r,
+        message: redactSecrets(r.message, secrets),
+      })),
+    })),
+  };
+  const json = redactSecrets(JSON.stringify(safeAgg, null, 2) + "\n", secrets);
   assertNoKeyLeak(json);
-  const md = renderMarkdown(aggregate);
-  const prefix = options.stub ? `${STUB_BANNER}\n` : "";
+  const md = redactSecrets(renderMarkdown(safeAgg), secrets);
+  assertNoKeyLeak(md);
+  const prefix = writePrefix(options);
   await writeFile(jsonPath, prefix + json, "utf8");
   await writeFile(mdPath, prefix + md, "utf8");
   return { jsonPath, mdPath };
@@ -194,6 +266,9 @@ function renderMarkdown(a: AggregateResult): string {
   const lines: string[] = [];
   lines.push(`# Eval results: ${a.label}`);
   lines.push("");
+  if (a.incomplete) {
+    lines.push(`- **Incomplete:** ${a.incompleteReason ?? INCOMPLETE_BANNER}`);
+  }
   lines.push(`- Provider: \`${a.provider}\``);
   lines.push(`- Model: \`${a.model}\``);
   lines.push(`- Temperature: ${a.temperature}`);
@@ -220,12 +295,12 @@ function renderMarkdown(a: AggregateResult): string {
   lines.push("## Attempts");
   lines.push("");
   lines.push(
-    "| Task | Run | Outcome | Input | Output | Thinking | Retries | Reason |",
+    "| Task | Run | Outcome | Finish | Input | Output | Thinking | Retries | Reason |",
   );
-  lines.push("|------|-----|---------|-------|--------|----------|---------|--------|");
+  lines.push("|------|-----|---------|--------|-------|--------|----------|---------|--------|");
   for (const r of a.attempts) {
     lines.push(
-      `| ${r.taskId} | ${r.run} | ${r.outcome} | ${r.inputTokens} | ${r.outputTokens} | ${r.thinkingTokens ?? ""} | ${r.retries.length} | ${r.failureReason ?? ""} |`,
+      `| ${r.taskId} | ${r.run} | ${r.outcome} | ${r.finishReason ?? ""} | ${r.inputTokens} | ${r.outputTokens} | ${r.thinkingTokens ?? ""} | ${r.retries.length} | ${r.failureReason ?? ""} |`,
     );
   }
   lines.push("");
