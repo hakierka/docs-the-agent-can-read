@@ -31,7 +31,7 @@ Some registered HTTP statuses are not in this tool’s table because http.cat ha
 no cat image for 505 (HTTP Version Not Supported)
 ```
 
-Exit code `2`. checked against http.cat on 2026-10-21.
+Exit code `2`. Checked against http.cat on 2026-10-21.
 
 Fix: pick a code from `cat-status --list`.
 

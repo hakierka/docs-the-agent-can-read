@@ -36,6 +36,12 @@ describe("cat-status <code>", () => {
     expect(r.stderr[0]).toMatch(/invalid status code/i);
   });
 
+  it("rejects leading zeros 0404 as invalid format (exit 2)", async () => {
+    const r = await runCli(["0404"]);
+    expect(r.code).toBe(2);
+    expect(r.stderr[0]).toMatch(/invalid status code/i);
+  });
+
   it("rejects 99 as out of range (exit 2)", async () => {
     const r = await runCli(["99"]);
     expect(r.code).toBe(2);

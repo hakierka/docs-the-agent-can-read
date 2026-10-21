@@ -152,14 +152,17 @@ export function parseArgs(argv: string[]): ParsedArgs {
 }
 
 /**
- * Accept only plain decimal integer strings in range 100–599 that appear
- * in the known table. Reject scientific notation, decimals, signs, empties.
+ * Accept only plain decimal integer strings in range 100–599.
+ * Reject scientific notation, decimals, signs, empties, and leading zeros (e.g. 0404).
  */
 export function parseStatusCode(raw: string): { ok: true; code: number } | { ok: false; reason: "format" | "range" | "unknown" } {
   if (raw === "" || !/^[0-9]+$/.test(raw)) {
     return { ok: false, reason: "format" };
   }
-  // Leading zeros like "0404" → numeric 404; still require the string to be digits only.
+  // Leading zeros like "0404" are invalid format (not normalized to 404).
+  if (raw.length > 1 && raw.startsWith("0")) {
+    return { ok: false, reason: "format" };
+  }
   const code = Number(raw);
   if (!Number.isInteger(code) || code < 100 || code > 599) {
     return { ok: false, reason: "range" };

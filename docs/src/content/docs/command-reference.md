@@ -10,8 +10,8 @@ cat-status <code>
 cat-status <code> --json
 cat-status <code> --save <path> [--force] [--timeout <ms>]
 cat-status --list [1xx|2xx|3xx|4xx|5xx] [--json]
-cat-status --help
-cat-status --version
+cat-status --help | -h
+cat-status --version | -V
 ```
 
 ## Arguments
@@ -20,13 +20,15 @@ cat-status --version
 
 HTTP status code to look up. Must be:
 
-1. Digits only (no decimals, signs, or scientific notation)
+1. Digits only (no decimals, signs, scientific notation, or leading zeros — use `404`, not `0404`)
 2. An integer from 100 through 599
 3. Present in the built-in table of codes that have a http.cat image
 
 On success, stdout is `https://http.cat/<code>`.
 
 Negative numbers look like options. Use `--` before the code if you need to pass a leading `-` (see Troubleshooting).
+
+Status classes for `--list` are lowercase: `1xx`, `2xx`, `3xx`, `4xx`, `5xx` (not `4XX`).
 
 ### Non-standard codes
 
@@ -77,11 +79,11 @@ Allow `--save` to overwrite an existing file. Only valid with `--save`.
 
 Download timeout for `--save`, in milliseconds. Default: `5000`. Only valid with `--save`.
 
-### `--help`
+### `--help` / `-h`
 
 Print short usage text. Exit `0`.
 
-### `--version`
+### `--version` / `-V`
 
 Print the package version. Exit `0`.
 
