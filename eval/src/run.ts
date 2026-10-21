@@ -10,9 +10,23 @@ import {
   createAnthropicModel,
   createStubModel,
   loadSystemPrompt,
-  type ModelClient,
 } from "./model.js";
-import { buildAggregate, writeAggregates, writeRawAttempt, type AttemptRecord } from "./results.js";
+import {
+  completeWithRetry,
+  createGoogleProvider,
+  requireProviderApiKey,
+  sleep,
+  wrapModelClient,
+  type EvalProvider,
+  type ProviderName,
+} from "./provider.js";
+import {
+  buildAggregate,
+  writeAggregates,
+  writeRawAttempt,
+  type AttemptRecord,
+  type AttemptOutcome,
+} from "./results.js";
 import { scoreModelOutput } from "./score.js";
 import { loadTasks } from "./tasks.js";
 
@@ -21,27 +35,38 @@ const EVAL_ROOT = join(__dirname, "..");
 const REPO_ROOT = join(EVAL_ROOT, "..");
 
 const DEFAULT_HARD_CAP = 50;
+const DEFAULT_DELAY_MS = 2000;
+const DEFAULT_GOOGLE_MODEL = "gemini-3.5-flash-lite";
+const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-5-5";
 
 type CliOptions = {
   docsDir: string;
+  provider: ProviderName;
   model: string;
   temperature: number;
   runs: number;
   label: string;
   dryRun: boolean;
   hardCap: number;
+  delayMs: number;
+  thinkingLevel: string;
   yes: boolean;
 };
 
 function parseCli(argv: string[]): CliOptions {
+  let provider: ProviderName = "google";
+  let modelExplicit = false;
   const opts: CliOptions = {
     docsDir: defaultDocsContentDir(REPO_ROOT),
-    model: "claude-haiku-5-5",
+    provider: "google",
+    model: DEFAULT_GOOGLE_MODEL,
     temperature: 0,
     runs: 3,
     label: "baseline",
     dryRun: false,
     hardCap: DEFAULT_HARD_CAP,
+    delayMs: DEFAULT_DELAY_MS,
+    thinkingLevel: "minimal",
     yes: false,
   };
 
@@ -59,8 +84,21 @@ function parseCli(argv: string[]): CliOptions {
       opts.docsDir = resolve(argv[++i]!);
       continue;
     }
+    if (a === "--provider") {
+      const p = argv[++i]!;
+      if (p !== "google" && p !== "anthropic") {
+        throw new Error(`unknown provider: ${p} (use google or anthropic)`);
+      }
+      provider = p;
+      opts.provider = p;
+      if (!modelExplicit) {
+        opts.model = p === "google" ? DEFAULT_GOOGLE_MODEL : DEFAULT_ANTHROPIC_MODEL;
+      }
+      continue;
+    }
     if (a === "--model") {
       opts.model = argv[++i]!;
+      modelExplicit = true;
       continue;
     }
     if (a === "--temperature") {
@@ -79,7 +117,19 @@ function parseCli(argv: string[]): CliOptions {
       opts.hardCap = Number(argv[++i]);
       continue;
     }
+    if (a === "--delay-ms") {
+      opts.delayMs = Number(argv[++i]);
+      continue;
+    }
+    if (a === "--thinking-level") {
+      opts.thinkingLevel = argv[++i]!;
+      continue;
+    }
     throw new Error(`unknown option: ${a}`);
+  }
+
+  if (opts.dryRun) {
+    opts.provider = "stub";
   }
   return opts;
 }
@@ -94,10 +144,25 @@ async function confirm(message: string): Promise<boolean> {
   }
 }
 
+async function createLiveProvider(opts: CliOptions): Promise<EvalProvider> {
+  const liveName: ProviderName = opts.provider === "google" ? "google" : "anthropic";
+  const checked = requireProviderApiKey(liveName);
+  if (!checked.ok) {
+    console.error(checked.reason);
+    process.exit(2);
+  }
+
+  if (liveName === "google") {
+    return createGoogleProvider(opts.model, opts.temperature, checked.key, opts.thinkingLevel);
+  }
+  const anthropic = await createAnthropicModel(opts.model, opts.temperature, checked.key);
+  return wrapModelClient("anthropic", anthropic, null);
+}
+
 async function main(): Promise<void> {
   const opts = parseCli(process.argv);
 
-  if (process.env.CI) {
+  if (process.env.CI && !opts.dryRun) {
     console.error("refuse: CI is set; eval runner must not run in CI");
     process.exit(2);
   }
@@ -118,19 +183,16 @@ async function main(): Promise<void> {
   );
   const docsCorpus = await loadDocsCorpus(opts.docsDir, join(REPO_ROOT, "docs"));
 
-  // Rough pre-estimate: corpus + prompt size (chars/4) × calls
   const approxInPerCall = Math.ceil((systemPrompt.length + docsCorpus.length + 200) / 4);
   const approxOutPerCall = 40;
   const estIn = approxInPerCall * plannedCalls;
   const estOut = approxOutPerCall * plannedCalls;
-  const estCost = estimateCostUsd(
-    pricing,
-    opts.dryRun ? "claude-haiku-5-5" : opts.model,
-    estIn,
-    estOut,
-  );
+  const estCost = estimateCostUsd(pricing, opts.model, estIn, estOut);
 
+  console.log(`Provider: ${opts.dryRun ? "stub" : opts.provider}`);
+  console.log(`Model: ${opts.dryRun ? "stub-dry-run" : opts.model}`);
   console.log(`Planned calls: ${plannedCalls} (${tasks.length} tasks × ${opts.runs} runs)`);
+  console.log(`Delay between calls: ${opts.dryRun ? 0 : opts.delayMs}ms`);
   console.log(`Estimated tokens: ~${estIn} input / ~${estOut} output`);
   console.log(
     `Estimated cost (from pricing.json): ${
@@ -141,15 +203,10 @@ async function main(): Promise<void> {
   console.log(`Label: ${opts.label}`);
   console.log(`System prompt hash: ${systemPromptHash}`);
 
-  let model: ModelClient;
+  let provider: EvalProvider;
   if (opts.dryRun) {
-    model = createStubModel();
+    provider = wrapModelClient("stub", createStubModel(), null);
   } else {
-    const key = process.env.ANTHROPIC_API_KEY;
-    if (!key) {
-      console.error("refuse: ANTHROPIC_API_KEY is missing");
-      process.exit(2);
-    }
     if (!opts.yes) {
       const ok = await confirm("Type y to proceed with live API calls: ");
       if (!ok) {
@@ -157,55 +214,96 @@ async function main(): Promise<void> {
         process.exit(1);
       }
     }
-    model = await createAnthropicModel(opts.model, opts.temperature, key);
+    provider = await createLiveProvider(opts);
   }
 
   const attempts: AttemptRecord[] = [];
   const rawDir = join(REPO_ROOT, "results", "raw");
   const resultsDir = join(REPO_ROOT, "results");
+  const delayMs = opts.dryRun ? 0 : opts.delayMs;
 
   // Tasks and runs must be sequential: checkCommand uses process.chdir (process-global).
-  // Do not fan out tasks or runs in parallel.
+  // Do not fan out tasks or runs in parallel. Live calls also wait delayMs between calls.
+  let callIndex = 0;
   for (const task of tasks) {
     for (let run = 1; run <= opts.runs; run++) {
+      if (callIndex > 0 && delayMs > 0) {
+        await sleep(delayMs);
+      }
+      callIndex++;
+
       const user = buildUserMessage(task, docsCorpus);
-      const completion = await model.complete(systemPrompt, user);
-      const scored = await scoreModelOutput(task, completion.text);
+      let outcome: AttemptOutcome;
+      let rawText = "";
+      let failureReason: string | null = null;
+      let inputTokens = 0;
+      let outputTokens = 0;
+      let thinkingTokens: number | null = null;
+      let retries: AttemptRecord["retries"] = [];
+
+      try {
+        const completed = await completeWithRetry(provider, systemPrompt, user);
+        retries = completed.retries;
+        rawText = completed.result.text;
+        inputTokens = completed.result.inputTokens;
+        outputTokens = completed.result.outputTokens;
+        thinkingTokens = completed.result.thinkingTokens ?? null;
+
+        const scored = await scoreModelOutput(task, rawText);
+        if (scored.ok) {
+          outcome = "pass";
+        } else {
+          outcome = "fail";
+          failureReason = scored.reason;
+        }
+      } catch (err) {
+        outcome = "error";
+        failureReason = err instanceof Error ? err.message : String(err);
+        rawText = "";
+      }
+
       const { usd, missingPrice } = estimateCostUsd(
         pricing,
-        opts.dryRun ? "claude-haiku-5-5" : opts.model,
-        completion.inputTokens,
-        completion.outputTokens,
+        opts.dryRun ? "gemini-3.5-flash-lite" : opts.model,
+        inputTokens,
+        outputTokens,
       );
 
       const record: AttemptRecord = {
         taskId: task.id,
         run,
-        model: model.id,
+        provider: provider.name,
+        model: provider.modelId,
         temperature: opts.temperature,
+        thinkingSetting: provider.thinkingSetting,
         date: new Date().toISOString(),
-        rawModelOutput: completion.text,
-        pass: scored.ok,
-        failureReason: scored.ok ? null : scored.reason,
-        inputTokens: completion.inputTokens,
-        outputTokens: completion.outputTokens,
+        rawModelOutput: rawText,
+        outcome,
+        pass: outcome === "pass",
+        failureReason,
+        inputTokens,
+        outputTokens,
+        thinkingTokens,
         costUsd: missingPrice ? null : usd,
         systemPromptHash,
+        retries,
       };
       attempts.push(record);
       await writeRawAttempt(rawDir, record);
       console.log(
-        `${task.id} run ${run}: ${record.pass ? "PASS" : "FAIL"}${
-          record.failureReason ? ` — ${record.failureReason}` : ""
-        }`,
+        `${task.id} run ${run}: ${outcome.toUpperCase()}${
+          failureReason ? ` — ${failureReason}` : ""
+        }${retries.length ? ` (retries: ${retries.length})` : ""}`,
       );
     }
   }
 
   const aggregate = buildAggregate(
     opts.label,
-    model.id,
+    provider.name,
+    provider.modelId,
     opts.temperature,
+    provider.thinkingSetting,
     systemPromptHash,
     pricing.sourceUrl,
     pricing.lookupDate,
@@ -215,7 +313,8 @@ async function main(): Promise<void> {
   const { jsonPath, mdPath } = await writeAggregates(resultsDir, opts.label, aggregate);
   console.log(`Wrote ${jsonPath}`);
   console.log(`Wrote ${mdPath}`);
-  console.log(`Overall: ${aggregate.overallPassRate}`);
+  console.log(`Overall (errors excluded): ${aggregate.overallPassRate}`);
+  console.log(`Errors: ${aggregate.overallErrors}`);
 }
 
 main().catch((err) => {

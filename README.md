@@ -36,7 +36,11 @@ Docs live in `docs/` (Astro Starlight). Build them with `npm run docs:build`.
 
 The harness in `eval/` scores whether a model can answer fixed tasks from the docs. It never opens a shell: the model returns JSON, and commands are checked then run in-process with a mocked fetch.
 
-Results record pass/fail, input and output tokens per run, and **consistency** per task (how many of its runs passed, e.g. `2/3`). Any baseline score is acceptable, including a near-perfect one. After the first real run, do not change existing task ids or expectations in `tasks.json`; if a task must change, add a **new** id and keep the old results in the table.
+**Default provider is Google** (`--provider google`) with model `gemini-3.5-flash-lite`. Optional compare model: `gemini-3.8-flash` via `--model`. Live Google runs need `GEMINI_API_KEY` (see `.env.example`) and an interactive `y` confirm. Anthropic remains available with `--provider anthropic` and `ANTHROPIC_API_KEY`. Refuse when `CI` is set. Do not put keys in CI.
+
+Free-tier requests may be used by Google to improve its products; eval content is public docs and synthetic tasks; results depend on the model and free-tier limits. Prices for Gemini free-tier entries in `eval/pricing.json` are `0` (lookup date recorded there).
+
+Results record pass/fail/error, provider, model, temperature, thinking setting, input/output/thinking tokens per run, retries, and **consistency** per task (how many of its scored runs passed, e.g. `2/3`; errors are counted separately and excluded from the pass rate). Any baseline score is acceptable, including a near-perfect one. After the first real run, do not change existing task ids or expectations in `tasks.json`; if a task must change, add a **new** id and keep the old results in the table.
 
 Known limits:
 
@@ -44,8 +48,11 @@ Known limits:
 - `"--flag=value"` forms are **not** supported by the CLI; a model that emits them fails.
 - Default scored shape: **one model**, **10 tasks**, **3 runs** each.
 - Temperature **0** is not fully deterministic; that is why there are multiple runs.
-
-Live runs need `ANTHROPIC_API_KEY` and an interactive `y` confirm. Refuse when `CI` is set. Do not put the key in CI.
+- The docs are given to the model as markdown source, not as rendered HTML pages; real agents often see HTML or search snippets.
+- The docs are short (a few pages) and fit in context; this does not test navigation or search in a large docs site.
+- The tasks were written by the docs author; a different author would pick different tasks.
+- One model per scored run, one date; results can change with model updates.
+- The test measures whether the docs let a model produce a correct command or answer; it does not measure whether the docs are pleasant for humans.
 
 ## Credits
 

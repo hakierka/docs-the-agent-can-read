@@ -41,26 +41,33 @@ describe("scoring + stub rendering", () => {
       attempts.push({
         taskId: task.id,
         run: 1,
+        provider: "stub",
         model: stub.id,
         temperature: 0,
+        thinkingSetting: null,
         date: new Date().toISOString(),
         rawModelOutput: completion.text,
+        outcome: scored.ok ? ("pass" as const) : ("fail" as const),
         pass: scored.ok,
         failureReason: scored.ok ? null : scored.reason,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
+        thinkingTokens: null,
         costUsd: 0,
         systemPromptHash: hash,
+        retries: [],
       });
     }
 
     const agg = buildAggregate(
       "baseline",
+      "stub",
       stub.id,
       0,
+      null,
       hash,
-      "https://platform.claude.com/docs/en/about-claude/pricing",
-      "2026-10-21",
+      "https://ai.google.dev/gemini-api/docs/rate-limits",
+      "2026-10-22",
       1,
       attempts,
     );
@@ -73,7 +80,7 @@ describe("scoring + stub rendering", () => {
     expect(agg.tasks.find((t) => t.id === "T9")?.passes).toBe(0);
     expect(agg.tasks.find((t) => t.id === "T10")?.passes).toBe(0);
     expect(agg.overallPasses).toBeGreaterThan(0);
-    expect(agg.overallPasses).toBeLessThan(agg.overallRuns);
+    expect(agg.overallPasses).toBeLessThan(agg.overallScoredRuns);
     expect(agg.attempts.every((a) => typeof a.inputTokens === "number")).toBe(true);
     expect(agg.attempts.every((a) => typeof a.outputTokens === "number")).toBe(true);
     expect(agg.systemPromptHash).toBe(hash);
