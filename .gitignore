@@ -3,6 +3,7 @@ dist/
 .env
 .DS_Store
 results/raw/
+results/dry-run/
 
 # docs build output
 docs/dist/

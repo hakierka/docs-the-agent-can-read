@@ -59,31 +59,69 @@ export type AggregateResult = {
   attempts: AttemptRecord[];
 };
 
-export async function writeRawAttempt(rawDir: string, record: AttemptRecord): Promise<void> {
-  await mkdir(rawDir, { recursive: true });
-  const name = `${record.taskId}-run${record.run}-${Date.now()}.json`;
-  const json = JSON.stringify(record, null, 2) + "\n";
-  // Never persist API key material if it somehow leaked into fields.
+/** First line of every dry-run / stub artifact. */
+export const STUB_BANNER = "STUB - NOT REAL RESULTS";
+
+export type OutputDirs =
+  | { ok: true; resultsDir: string; rawDir: string; stub: boolean }
+  | { ok: false; reason: string };
+
+/**
+ * Dry-run → results/dry-run/ (+ raw/). Live → results/ (+ raw/).
+ * Live runs may not use the label "dry-run".
+ */
+export function resolveOutputDirs(
+  repoRoot: string,
+  options: { dryRun: boolean; label: string },
+): OutputDirs {
+  if (!options.dryRun && options.label === "dry-run") {
+    return {
+      ok: false,
+      reason: 'refuse: label "dry-run" is reserved for stub output; pick another --label',
+    };
+  }
+  if (options.dryRun) {
+    const resultsDir = join(repoRoot, "results", "dry-run");
+    return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: true };
+  }
+  const resultsDir = join(repoRoot, "results");
+  return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: false };
+}
+
+function assertNoKeyLeak(json: string): void {
   if (/AIza[0-9A-Za-z_-]{10,}|sk-[a-zA-Z0-9]{10,}/.test(json)) {
     throw new Error("refuse: refusing to write results that look like they contain an API key");
   }
-  await writeFile(join(rawDir, name), json, "utf8");
+}
+
+export async function writeRawAttempt(
+  rawDir: string,
+  record: AttemptRecord,
+  options: { stub?: boolean } = {},
+): Promise<void> {
+  await mkdir(rawDir, { recursive: true });
+  const name = `${record.taskId}-run${record.run}-${Date.now()}.json`;
+  const json = JSON.stringify(record, null, 2) + "\n";
+  assertNoKeyLeak(json);
+  const body = options.stub ? `${STUB_BANNER}\n${json}` : json;
+  await writeFile(join(rawDir, name), body, "utf8");
 }
 
 export async function writeAggregates(
   resultsDir: string,
   label: string,
   aggregate: AggregateResult,
+  options: { stub?: boolean } = {},
 ): Promise<{ jsonPath: string; mdPath: string }> {
   await mkdir(resultsDir, { recursive: true });
   const jsonPath = join(resultsDir, `${label}.json`);
   const mdPath = join(resultsDir, `${label}.md`);
   const json = JSON.stringify(aggregate, null, 2) + "\n";
-  if (/AIza[0-9A-Za-z_-]{10,}|sk-[a-zA-Z0-9]{10,}/.test(json)) {
-    throw new Error("refuse: refusing to write results that look like they contain an API key");
-  }
-  await writeFile(jsonPath, json, "utf8");
-  await writeFile(mdPath, renderMarkdown(aggregate), "utf8");
+  assertNoKeyLeak(json);
+  const md = renderMarkdown(aggregate);
+  const prefix = options.stub ? `${STUB_BANNER}\n` : "";
+  await writeFile(jsonPath, prefix + json, "utf8");
+  await writeFile(mdPath, prefix + md, "utf8");
   return { jsonPath, mdPath };
 }
 

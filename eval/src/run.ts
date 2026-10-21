@@ -22,6 +22,7 @@ import {
 } from "./provider.js";
 import {
   buildAggregate,
+  resolveOutputDirs,
   writeAggregates,
   writeRawAttempt,
   type AttemptRecord,
@@ -217,9 +218,14 @@ async function main(): Promise<void> {
     provider = await createLiveProvider(opts);
   }
 
+  const out = resolveOutputDirs(REPO_ROOT, { dryRun: opts.dryRun, label: opts.label });
+  if (!out.ok) {
+    console.error(out.reason);
+    process.exit(2);
+  }
+  const { resultsDir, rawDir, stub } = out;
+
   const attempts: AttemptRecord[] = [];
-  const rawDir = join(REPO_ROOT, "results", "raw");
-  const resultsDir = join(REPO_ROOT, "results");
   const delayMs = opts.dryRun ? 0 : opts.delayMs;
 
   // Tasks and runs must be sequential: checkCommand uses process.chdir (process-global).
@@ -289,7 +295,7 @@ async function main(): Promise<void> {
         retries,
       };
       attempts.push(record);
-      await writeRawAttempt(rawDir, record);
+      await writeRawAttempt(rawDir, record, { stub });
       console.log(
         `${task.id} run ${run}: ${outcome.toUpperCase()}${
           failureReason ? ` — ${failureReason}` : ""
@@ -310,7 +316,9 @@ async function main(): Promise<void> {
     opts.runs,
     attempts,
   );
-  const { jsonPath, mdPath } = await writeAggregates(resultsDir, opts.label, aggregate);
+  const { jsonPath, mdPath } = await writeAggregates(resultsDir, opts.label, aggregate, {
+    stub,
+  });
   console.log(`Wrote ${jsonPath}`);
   console.log(`Wrote ${mdPath}`);
   console.log(`Overall (errors excluded): ${aggregate.overallPassRate}`);
