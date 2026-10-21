@@ -1,0 +1,18 @@
+{
+  "sourceUrl": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "lookupDate": "2026-10-21",
+  "currency": "USD",
+  "unit": "per_million_tokens",
+  "models": {
+    "claude-haiku-5-5": {
+      "inputPerMTok": 0.1,
+      "outputPerMTok": 0.5,
+      "notes": "Prompts up to 100,000 tokens (standard tier). Over 100k is $0.50 / $2.50 — not used for estimates under that size."
+    },
+    "claude-sonnet-5-5": {
+      "inputPerMTok": 2.0,
+      "outputPerMTok": 10.0,
+      "notes": "Optional compare model only."
+    }
+  }
+}

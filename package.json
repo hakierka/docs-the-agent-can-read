@@ -24,7 +24,9 @@
     "test:watch": "vitest",
     "docs:dev": "npm run dev --prefix docs",
     "docs:build": "npm run build --prefix docs",
-    "docs:check-links": "npm run check-links --prefix docs"
+    "docs:check-links": "npm run check-links --prefix docs",
+    "eval:dry-run": "npm run dry-run --prefix eval",
+    "eval:test": "npm test --prefix eval"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
