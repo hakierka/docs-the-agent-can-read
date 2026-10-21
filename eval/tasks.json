@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "T1",
+      "type": "command",
+      "prompt": "Print the http.cat image URL for status code 404. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "404",
+          "json": false,
+          "force": false
+        },
+        "exitCode": 0,
+        "stdout": ["https://http.cat/404"]
+      },
+      "fairness": "Fair: Quick start shows `cat-status 404` and the exact stdout URL."
+    },
+    {
+      "id": "T2",
+      "type": "command",
+      "prompt": "Look up status code 418 and print the result as JSON. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "418",
+          "json": true,
+          "force": false
+        },
+        "exitCode": 0,
+        "stdoutIncludes": { "code": 418 }
+      },
+      "fairness": "Fair: Quick start shows `cat-status 418 --json`; Command reference documents `--json`."
+    },
+    {
+      "id": "T3",
+      "type": "command",
+      "prompt": "List all client error (4xx) codes that cat-status supports, as JSON. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "list",
+          "statusClass": "4xx",
+          "json": true
+        },
+        "exitCode": 0
+      },
+      "fairness": "Fair: Quick start shows `--list 4xx`; Command reference synopsis allows `--list … [--json]`."
+    },
+    {
+      "id": "T4",
+      "type": "command",
+      "prompt": "Save the http.cat image for status 200 to the file cats/ok.jpg, replacing the file if it already exists. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "200",
+          "json": false,
+          "savePath": "cats/ok.jpg",
+          "force": true
+        },
+        "exitCode": 0,
+        "stdout": ["https://http.cat/200"]
+      },
+      "fairness": "Fair: Quick start shows save for 200 and `--force` to overwrite; Command reference documents `--save` and `--force`."
+    },
+    {
+      "id": "T5",
+      "type": "command",
+      "prompt": "Save the image for status 503 to a.jpg, but give up after 2 seconds if the download is too slow. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "503",
+          "json": false,
+          "savePath": "a.jpg",
+          "force": false,
+          "timeoutMs": 2000
+        },
+        "exitCode": 0,
+        "stdout": ["https://http.cat/503"]
+      },
+      "fairness": "Fair: Command reference documents `--save <path>` and `--timeout <ms>` (milliseconds); 2 seconds = 2000."
+    },
+    {
+      "id": "T6",
+      "type": "command",
+      "prompt": "Look up the status code -1 with cat-status. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "-1",
+          "json": false,
+          "force": false
+        },
+        "exitCode": 2
+      },
+      "fairness": "Fair: Troubleshooting documents `cat-status -- -1` and exit code 2 (not 1)."
+    },
+    {
+      "id": "T7",
+      "type": "answer",
+      "prompt": "What exit code does cat-status return for the real HTTP status 505? Reply with JSON only; the answer must be a JSON number, for example {\"answer\": 2}.",
+      "expect": {
+        "answer": 2
+      },
+      "fairness": "Fair: Quick start and Troubleshooting both state exit code 2 for 505 (no cat image)."
+    },
+    {
+      "id": "T8",
+      "type": "answer",
+      "prompt": "What exit code does cat-status return if I pass --timeout 3000 without --save? Reply with JSON only; the answer must be a JSON number, for example {\"answer\": 2}.",
+      "expect": {
+        "answer": 1
+      },
+      "fairness": "Fair: Command reference says --timeout is only valid with --save; exit code table lists 1 as usage error."
+    },
+    {
+      "id": "T9",
+      "type": "answer",
+      "prompt": "Which product documents the non-standard status code 444? Reply with JSON only, for example {\"answer\": \"...\"}, lowercase product name.",
+      "expect": {
+        "answer": "nginx"
+      },
+      "fairness": "Fair: Command reference non-standard table lists 444 → nginx."
+    },
+    {
+      "id": "T10",
+      "type": "command",
+      "prompt": "Save the image for 418 to teapot.jpg, and never overwrite an existing file. Reply with JSON only, for example {\"command\":\"cat-status ...\"}.",
+      "expect": {
+        "parsed": {
+          "kind": "lookup",
+          "rawCode": "418",
+          "json": false,
+          "savePath": "teapot.jpg",
+          "force": false
+        },
+        "exitCode": 0,
+        "stdout": ["https://http.cat/418"]
+      },
+      "fairness": "Fair: Quick start and Command reference document --save without --force (refuses overwrite)."
+    }
+  ]
+}
