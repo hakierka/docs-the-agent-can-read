@@ -1,0 +1,12 @@
+---
+title: Introduction
+description: What cat-status does.
+---
+
+`cat-status` maps an HTTP status code to a [http.cat](https://http.cat) image URL.
+
+It only accepts codes that have an image on http.cat. Those codes are baked into the CLI as a static table. If a code is missing from that table, the command fails. A few entries are **non-standard** (Laravel, nginx, Cloudflare) and are labeled in `--list`.
+
+Optional: download the image to a file with `--save`. That is the only network call.
+
+Images come from http.cat. This project does not ship the image files. Allowlist checked against http.cat on 2026-10-21.
