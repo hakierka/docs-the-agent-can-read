@@ -1,7 +1,13 @@
 {
   "name": "cat-status",
   "version": "1.0.0",
+  "private": true,
   "description": "Print or save http.cat images for known HTTP status codes.",
+  "author": "Amy Waliszewska",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hakierka/docs-the-agent-can-read.git"
+  },
   "type": "module",
   "engines": {
     "node": ">=22"
