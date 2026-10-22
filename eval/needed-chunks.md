@@ -46,7 +46,7 @@ Empty `##` / `###` / intro sections produce no chunk (so parent-only headings li
 
 T1: needs [quick-start] OR [command-reference--arguments--code]
 
-T2: needs [quick-start] OR [command-reference--flags--json AND command-reference--arguments--code]
+T2: needs [quick-start] OR [command-reference--flags--json AND command-reference--arguments--code] OR [command-reference--synopsis]
 
 T3: needs [command-reference--synopsis] OR [quick-start AND command-reference--flags--json] OR [command-reference--flags--list-1xx-2xx-3xx-4xx-5xx AND command-reference--flags--json]
 
@@ -62,4 +62,4 @@ T8: needs [command-reference--flags--timeout-ms AND command-reference--exit-code
 
 T9: needs [command-reference--arguments--non-standard-codes]
 
-T10: needs [quick-start] OR [command-reference--flags--save-path]
+T10: needs [quick-start] OR [command-reference--flags--save-path] OR [troubleshooting--file-already-exists AND command-reference--flags--save-path]
