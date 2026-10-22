@@ -6,12 +6,18 @@ import {
   completeWithRetry,
   HttpStatusError,
   isRateLimitError,
+  parseRetryHintMs,
   requireProviderApiKey,
+  resolveRetryWaitMs,
+  RetriesExhaustedError,
   type EvalProvider,
 } from "../src/provider.js";
 import { buildAggregate, writeRawAttempt, type AttemptRecord } from "../src/results.js";
 
-function fakeProvider(sequence: Array<"ok" | 429 | Error>): EvalProvider {
+function fakeProvider(
+  sequence: Array<"ok" | 429 | Error>,
+  rateLimitMessage = "rate limited",
+): EvalProvider {
   let i = 0;
   return {
     name: "stub",
@@ -24,7 +30,7 @@ function fakeProvider(sequence: Array<"ok" | 429 | Error>): EvalProvider {
         return { text: '{"answer":1}', inputTokens: 3, outputTokens: 2, thinkingTokens: 0 };
       }
       if (step === 429) {
-        throw new HttpStatusError(429, "rate limited");
+        throw new HttpStatusError(429, rateLimitMessage);
       }
       throw step;
     },
@@ -50,11 +56,54 @@ describe("provider interface + retry", () => {
     expect(retries.every((r) => r.status === 429)).toBe(true);
   });
 
-  it("after 429 retries exhausted, call site can mark outcome error", async () => {
-    const p = fakeProvider([429, 429, 429]);
-    await expect(
-      completeWithRetry(p, "s", "u", { maxRetries: 2, backoffMs: 1 }),
-    ).rejects.toMatchObject({ status: 429 });
+  it("after 429 retries exhausted, error carries all retry records", async () => {
+    const p = fakeProvider([429, 429, 429], "Please retry in 1s — quota");
+    const waits: number[] = [];
+    let caught: unknown;
+    try {
+      await completeWithRetry(p, "s", "u", {
+        maxRetries: 2,
+        backoffMs: 1,
+        sleepFn: async (ms) => {
+          waits.push(ms);
+        },
+      });
+    } catch (err) {
+      caught = err;
+    }
+    expect(caught).toBeInstanceOf(RetriesExhaustedError);
+    const exhausted = caught as RetriesExhaustedError;
+    expect(exhausted.status).toBe(429);
+    expect(exhausted.retries).toHaveLength(3);
+    expect(exhausted.retries.every((r) => r.status === 429)).toBe(true);
+    expect(exhausted.retries.map((r) => r.attempt)).toEqual([1, 2, 3]);
+    expect(exhausted.retries.every((r) => r.message.includes("Please retry in"))).toBe(
+      true,
+    );
+    // Two sleeps between three attempts.
+    expect(waits).toHaveLength(2);
+  });
+
+  it("honors Please retry in hint over shorter scheduled backoff (capped at 65s)", async () => {
+    const p = fakeProvider(
+      [429, "ok"],
+      'quota hit. Please retry in 2.5s. {"retryDelay":"2s"}',
+    );
+    const waits: number[] = [];
+    const { result, retries } = await completeWithRetry(p, "s", "u", {
+      maxRetries: 2,
+      backoffMs: 100,
+      sleepFn: async (ms) => {
+        waits.push(ms);
+      },
+    });
+    expect(result.text).toContain("answer");
+    expect(retries).toHaveLength(1);
+    // max(2500ms hint, 100*1 scheduled) = 2500
+    expect(waits).toEqual([2500]);
+    expect(parseRetryHintMs(new Error("Please retry in 9.194102525s."))).toBe(9195);
+    expect(parseRetryHintMs(new Error('"retryDelay":"58s"'))).toBe(58000);
+    expect(resolveRetryWaitMs(0, 1000, new Error("Please retry in 90s"))).toBe(65000);
   });
 
   it("isRateLimitError detects 429", () => {

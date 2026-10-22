@@ -32,6 +32,81 @@ export class HttpStatusError extends Error {
   }
 }
 
+/** Thrown when 429 retries are exhausted; carries every failed-attempt record. */
+export class RetriesExhaustedError extends Error {
+  readonly retries: RetryRecord[];
+  readonly status: number;
+  readonly causeErr: unknown;
+  constructor(message: string, retries: RetryRecord[], cause: unknown) {
+    super(message);
+    this.name = "RetriesExhaustedError";
+    this.retries = retries;
+    this.causeErr = cause;
+    this.status =
+      cause instanceof HttpStatusError
+        ? cause.status
+        : isRateLimitError(cause)
+          ? 429
+          : 0;
+  }
+}
+
+const RETRY_HINT_CAP_MS = 65_000;
+
+/**
+ * Parse a provider retry hint from error text (`Please retry in Ns`) or a
+ * `retryDelay` field (`"9s"` / `9`). Returns milliseconds, or null if absent.
+ */
+export function parseRetryHintMs(err: unknown): number | null {
+  const msg = err instanceof Error ? err.message : String(err);
+  const please = /Please retry in\s+([\d.]+)\s*s/i.exec(msg);
+  if (please) {
+    const sec = Number(please[1]);
+    if (Number.isFinite(sec) && sec >= 0) return Math.ceil(sec * 1000);
+  }
+  const delayField = /"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s?"/i.exec(msg);
+  if (delayField) {
+    const sec = Number(delayField[1]);
+    if (Number.isFinite(sec) && sec >= 0) return Math.ceil(sec * 1000);
+  }
+  if (err && typeof err === "object" && "retryDelay" in err) {
+    const raw = (err as { retryDelay?: unknown }).retryDelay;
+    if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+      // Treat bare numbers as seconds when small; milliseconds when large.
+      return raw > 1000 ? Math.ceil(raw) : Math.ceil(raw * 1000);
+    }
+    if (typeof raw === "string") {
+      const m = /^([\d.]+)\s*s?$/i.exec(raw.trim());
+      if (m) {
+        const sec = Number(m[1]);
+        if (Number.isFinite(sec) && sec >= 0) return Math.ceil(sec * 1000);
+      }
+    }
+  }
+  return null;
+}
+
+/** Wait = max(hint, scheduled backoff), capped at 65s. */
+export function resolveRetryWaitMs(
+  attemptIndex: number,
+  backoffMs: number,
+  err: unknown,
+): number {
+  const scheduled = backoffMs * (attemptIndex + 1);
+  const hint = parseRetryHintMs(err);
+  const wait = hint == null ? scheduled : Math.max(hint, scheduled);
+  return Math.min(wait, RETRY_HINT_CAP_MS);
+}
+
+function retryRecordFromError(attempt: number, err: unknown): RetryRecord {
+  return {
+    attempt,
+    status: err instanceof HttpStatusError ? err.status : 429,
+    at: new Date().toISOString(),
+    message: err instanceof Error ? err.message : String(err),
+  };
+}
+
 /** Non-STOP finishReason or empty text — always scored as outcome "error", never "fail". */
 export class CompletionQualityError extends Error {
   readonly finishReason: string | null;
@@ -102,16 +177,23 @@ export function interpretGoogleResponse(response: {
 
 /**
  * Call provider.complete with up to 2 retries on HTTP 429 (3 attempts total).
- * Every retry is recorded; after exhaustion the error is rethrown.
+ * Every failed rate-limit attempt is recorded. After exhaustion, throws
+ * `RetriesExhaustedError` carrying the full retry list (so callers can store it).
+ * Wait between tries: max(provider retry hint, scheduled backoff), capped at 65s.
  */
 export async function completeWithRetry(
   provider: EvalProvider,
   system: string,
   user: string,
-  options: { maxRetries?: number; backoffMs?: number } = {},
+  options: {
+    maxRetries?: number;
+    backoffMs?: number;
+    sleepFn?: (ms: number) => Promise<void>;
+  } = {},
 ): Promise<{ result: ProviderCompleteResult; retries: RetryRecord[] }> {
   const maxRetries = options.maxRetries ?? 2;
   const backoffMs = options.backoffMs ?? 1000;
+  const sleeper = options.sleepFn ?? sleep;
   const retries: RetryRecord[] = [];
   let lastErr: unknown;
 
@@ -121,16 +203,15 @@ export async function completeWithRetry(
       return { result, retries };
     } catch (err) {
       lastErr = err;
-      if (!isRateLimitError(err) || attempt === maxRetries) {
+      if (!isRateLimitError(err)) {
         throw err;
       }
-      retries.push({
-        attempt: attempt + 1,
-        status: 429,
-        at: new Date().toISOString(),
-        message: err instanceof Error ? err.message : String(err),
-      });
-      await sleep(backoffMs * (attempt + 1));
+      retries.push(retryRecordFromError(attempt + 1, err));
+      if (attempt === maxRetries) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new RetriesExhaustedError(message, retries, err);
+      }
+      await sleeper(resolveRetryWaitMs(attempt, backoffMs, err));
     }
   }
   throw lastErr;

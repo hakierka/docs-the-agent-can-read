@@ -25,6 +25,7 @@ import {
   CompletionQualityError,
   createGoogleProvider,
   requireProviderApiKey,
+  RetriesExhaustedError,
   sleep,
   wrapModelClient,
   type EvalProvider,
@@ -360,6 +361,12 @@ async function main(): Promise<void> {
         outcome = "error";
         failureReason = err instanceof Error ? err.message : String(err);
         rawText = "";
+        if (err instanceof RetriesExhaustedError) {
+          retries = err.retries.map((r) => ({
+            ...r,
+            message: redactSecrets(r.message, secrets, REPO_ROOT),
+          }));
+        }
         if (err instanceof CompletionQualityError) {
           finishReason = err.finishReason;
         }
