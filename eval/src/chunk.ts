@@ -49,7 +49,8 @@ function fenceToggle(line: string, openMarker: string | null): string | null {
  * Split one page by ## / ### outside fenced code blocks.
  * - Headings inside ``` / ~~~ fences are ignored.
  * - No ##/### → one chunk (entire body under page title), or none if empty.
- * - Content before first heading → page-title chunk only when non-empty after trim.
+ * - Content before the first heading (preamble) is **not** its own chunk; it is
+ *   prepended to the first section chunk of that page (id stays that section’s).
  * - ## / ### with no body text (empty after trim) produce **no** chunk.
  */
 export function chunkPage(page: DocPage): DocChunk[] {
@@ -107,22 +108,14 @@ export function chunkPage(page: DocPage): DocChunk[] {
     segs[segs.length - 1]!.lines.push(line);
   }
 
+  const preamble = (segs[0]?.level === 0 ? segs[0].lines.join("\n").trim() : "") || "";
   const chunks: DocChunk[] = [];
   let h2ForPath = "";
+  let preamblePending = preamble;
 
   for (const seg of segs) {
+    if (seg.level === 0) continue;
     const body = seg.lines.join("\n").trim();
-    if (seg.level === 0) {
-      if (!body) continue;
-      chunks.push({
-        id: `${pageId}--intro`,
-        pageTitle: page.title,
-        headingPath: "",
-        prefix: page.title,
-        text: body,
-      });
-      continue;
-    }
     // Keep h2 path for ### children even when the ## body itself is empty.
     if (seg.level === 2) h2ForPath = seg.heading;
     if (!body) continue;
@@ -136,13 +129,28 @@ export function chunkPage(page: DocPage): DocChunk[] {
       seg.level === 2
         ? `${pageId}--${slugify(seg.heading)}`
         : `${pageId}--${slugify(h2ForPath || "section")}--${slugify(seg.heading)}`;
+    const text = preamblePending ? `${preamblePending}\n\n${body}` : body;
+    preamblePending = "";
     chunks.push({
       id,
       pageTitle: page.title,
       headingPath,
       prefix: `${page.title} > ${headingPath}`,
-      text: body,
+      text,
     });
+  }
+
+  // Headings existed but every section was empty: keep preamble as the sole page chunk.
+  if (chunks.length === 0 && preamble) {
+    return [
+      {
+        id: pageId,
+        pageTitle: page.title,
+        headingPath: "",
+        prefix: page.title,
+        text: preamble,
+      },
+    ];
   }
 
   return chunks;

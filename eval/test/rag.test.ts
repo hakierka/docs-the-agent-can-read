@@ -50,14 +50,38 @@ const beta: DocPage = {
 };
 
 describe("chunker (synthetic)", () => {
-  it("splits ## / ### with nested heading path and intro chunk", () => {
+  it("splits ## / ### with nested heading path; no --intro chunk", () => {
     const chunks = chunkPage(alpha);
-    expect(chunks.some((c) => c.id.endsWith("--intro"))).toBe(true);
+    expect(chunks.some((c) => c.id.endsWith("--intro"))).toBe(false);
     const timeout = chunks.find((c) => c.prefix.includes("--timeout"));
     expect(timeout).toBeTruthy();
     expect(timeout!.prefix).toBe("Alpha Page > Flags > --timeout");
     expect(timeout!.text).toMatch(/milliseconds/);
     expect(timeout!.id).toContain("timeout");
+  });
+
+  it("merges page preamble into the first section chunk (id stays first section)", () => {
+    const page: DocPage = {
+      file: "preamble-merge.md",
+      title: "Preamble Page",
+      body: `Preamble line about cat-status before any heading.
+
+## First Section
+
+Body of the first section.
+
+## Second Section
+
+Body of the second section.`,
+    };
+    const chunks = chunkPage(page);
+    expect(chunks.some((c) => c.id.endsWith("--intro"))).toBe(false);
+    expect(chunks[0]!.id).toBe("preamble-merge--first-section");
+    expect(chunks[0]!.text).toMatch(/^Preamble line about cat-status/);
+    expect(chunks[0]!.text).toContain("Body of the first section.");
+    expect(chunks[1]!.id).toBe("preamble-merge--second-section");
+    expect(chunks[1]!.text).not.toContain("Preamble line");
+    expect(chunks[1]!.text).toBe("Body of the second section.");
   });
 
   it("no-heading page → one chunk under page title", () => {
@@ -99,11 +123,23 @@ Outside the fence.
     expect(ids.some((id) => id.includes("also-not"))).toBe(false);
     expect(chunks.some((c) => c.headingPath === "Real")).toBe(true);
     expect(chunks.find((c) => c.headingPath === "Real")!.text).toMatch(/Outside the fence/);
-    // Fenced fake heading text stays inside the intro (or prior) chunk body.
+    // Fenced fake heading text stays inside the prior (preamble-merged) chunk body.
     expect(chunks.some((c) => c.text.includes("## not a heading"))).toBe(true);
   });
 
-  it("drops empty ## / ### / intro chunks", () => {
+  it("v1 docs chunk id inventory matches needed-chunks.md exactly", async () => {
+    const docsDir = join(REPO_ROOT, "docs", "src", "content", "docs");
+    const pages = await loadDocsPages(docsDir, join(REPO_ROOT, "docs"), {
+      includeLlms: false,
+    });
+    const ids = chunkPages(pages).map((c) => c.id);
+    const md = await readFile(join(EVAL_ROOT, "needed-chunks.md"), "utf8");
+    const listed = [...md.matchAll(/^\| `([^`]+)` \|/gm)].map((m) => m[1]!);
+    expect(listed.length).toBeGreaterThan(0);
+    expect(ids).toEqual(listed);
+  });
+
+  it("drops empty ## / ### sections (no orphan preamble chunk when a section exists)", () => {
     const page: DocPage = {
       file: "empty-secs.md",
       title: "EmptySecs",
