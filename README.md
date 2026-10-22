@@ -42,6 +42,31 @@ Free-tier requests may be used by Google to improve its products; eval content i
 
 Results record pass/fail/error, provider, model, temperature, thinking setting, input/output/thinking tokens per run, retries, and **consistency** per task (how many of its scored runs passed, e.g. `2/3`; errors are counted separately and excluded from the pass rate). Any baseline score is acceptable, including a near-perfect one. After the first real run, do not change existing task ids or expectations in `tasks.json`; if a task must change, add a **new** id and keep the old results in the table.
 
+### Results
+
+Baseline for **docs v1** with `gemini-3.5-flash-lite`, temperature `0`, thinking `minimal`. Ten tasks, three runs each. Run on 2026-10-22 (UTC timestamp `2026-10-21T23:02Z`). Score: **30/30**. Every task was 3/3. No errors. Details: [`results/baseline.md`](results/baseline.md).
+
+| Task | Consistency | Errors |
+|------|-------------|--------|
+| T1 | 3/3 | 0 |
+| T2 | 3/3 | 0 |
+| T3 | 3/3 | 0 |
+| T4 | 3/3 | 0 |
+| T5 | 3/3 | 0 |
+| T6 | 3/3 | 0 |
+| T7 | 3/3 | 0 |
+| T8 | 3/3 | 0 |
+| T9 | 3/3 | 0 |
+| T10 | 3/3 | 0 |
+
+The docs v1 corpus is about 2,000 input tokens per call, so the whole docs set fits in the model context. That is why this test cannot show a benefit from agent-oriented docs here: the result is already at the ceiling.
+
+No improvement is claimed. Phase 3 (agent-oriented docs and a second scored run) has not been done.
+
+The tasks were frozen in commit `e6fe6ca` and pushed before any real model run (see git history).
+
+Not covered by this baseline: retrieval-limited context (agent sees only one page), larger docs, other models, or rendered HTML.
+
 Known limits:
 
 - Scoring is lenient on **extra** flags the task does not mention (only expected parsed fields are checked).
