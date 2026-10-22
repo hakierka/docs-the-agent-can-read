@@ -5,6 +5,7 @@ dist/
 results/raw/
 results/dry-run/
 results/smoke*/
+results/incomplete/
 
 # docs build output
 docs/dist/
