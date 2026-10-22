@@ -7,7 +7,7 @@ Applies to: cat-status 1.0.0. Last checked: 2026-10-22.
 
 ## Read what shipped in 1.0.0
 
-Version `1.0.0` is the first release of the `cat-status` CLI (package.json version string printed by `cat-status --version`).
+Version `1.0.0` is the first version of the `cat-status` CLI (package.json version string printed by `cat-status --version`).
 
 Command to print the version:
 
