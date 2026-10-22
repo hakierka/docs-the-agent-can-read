@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { isAbsolute, join, relative, sep } from "node:path";
 import type { RetryRecord } from "./provider.js";
 
 export type AttemptOutcome = "pass" | "fail" | "error";
@@ -119,8 +119,52 @@ export function resolveOutputDirs(
   return { ok: true, resultsDir, rawDir: join(resultsDir, "raw"), stub: false };
 }
 
-/** Replace known secret values with [REDACTED]. */
-export function redactSecrets(text: string, secrets: string[]): string {
+/**
+ * Docs path recorded in results: always relative to the repo root, POSIX separators.
+ * Never an absolute filesystem path.
+ */
+export function toRepoRelativeDocsPath(repoRoot: string, docsPath: string): string {
+  const rel = isAbsolute(docsPath) ? relative(repoRoot, docsPath) : docsPath;
+  const normalized = rel.split(sep).join("/");
+  if (!normalized || normalized === ".") return ".";
+  // If docsPath lies outside the repo, do not keep an absolute or `../` escape.
+  if (isAbsolute(normalized) || normalized.startsWith("../") || normalized === "..") {
+    return sanitizeAbsolutePaths(docsPath);
+  }
+  return normalized;
+}
+
+/**
+ * Replace absolute filesystem paths (and known home/tmp roots) so results never
+ * embed machine-local paths. Repo-root prefix is stripped to a relative remnant when possible.
+ */
+export function sanitizeAbsolutePaths(text: string, repoRoot?: string): string {
+  let out = text ?? "";
+  if (repoRoot) {
+    const root = repoRoot.replace(/[/\\]+$/, "");
+    const rootPosix = root.split(sep).join("/");
+    if (rootPosix.length > 1) {
+      out = out.split(rootPosix + "/").join("");
+      out = out.split(rootPosix).join(".");
+      // Also handle native separators if present in the string.
+      if (sep !== "/") {
+        out = out.split(root + sep).join("");
+        out = out.split(root).join(".");
+      }
+    }
+  }
+  // Unix absolute paths (incl. /Users/..., /tmp/..., /home/...).
+  out = out.replace(/(^|[\s"'`=(])(\/(?:Users|home|tmp|var|private|opt|Library|Volumes)\/[^\s"'`]+)/g, "$1[PATH]");
+  // Other absolute Unix paths with at least two segments.
+  out = out.replace(/(^|[\s"'`=(])(\/[A-Za-z0-9._-]+(?:\/[^\s"'`]+)+)/g, "$1[PATH]");
+  // Windows paths: C:\... or \\server\share\...
+  out = out.replace(/(^|[\s"'`=(])([A-Za-z]:\\[^\s"'`]+)/g, "$1[PATH]");
+  out = out.replace(/(^|[\s"'`=(])(\\\\[^\s"'`]+)/g, "$1[PATH]");
+  return out;
+}
+
+/** Replace known secret values with [REDACTED], then strip absolute paths. */
+export function redactSecrets(text: string, secrets: string[], repoRoot?: string): string {
   let out = text;
   for (const secret of secrets) {
     if (!secret || secret.length < 4) continue;
@@ -128,7 +172,27 @@ export function redactSecrets(text: string, secrets: string[]): string {
       out = out.split(secret).join("[REDACTED]");
     }
   }
-  return out;
+  return sanitizeAbsolutePaths(out, repoRoot);
+}
+
+function scrubAttemptRecord(
+  record: AttemptRecord,
+  secrets: string[],
+  repoRoot?: string,
+): AttemptRecord {
+  return {
+    ...record,
+    docsPath: sanitizeAbsolutePaths(record.docsPath, repoRoot),
+    rawModelOutput: redactSecrets(record.rawModelOutput, secrets, repoRoot),
+    failureReason:
+      record.failureReason == null
+        ? null
+        : redactSecrets(record.failureReason, secrets, repoRoot),
+    retries: record.retries.map((r) => ({
+      ...r,
+      message: redactSecrets(r.message, secrets, repoRoot),
+    })),
+  };
 }
 
 export function nextConsecutiveErrors(
@@ -154,24 +218,22 @@ function writePrefix(options: { stub?: boolean; incomplete?: boolean }): string 
 export async function writeRawAttempt(
   rawDir: string,
   record: AttemptRecord,
-  options: { stub?: boolean; incomplete?: boolean; secrets?: string[] } = {},
+  options: {
+    stub?: boolean;
+    incomplete?: boolean;
+    secrets?: string[];
+    repoRoot?: string;
+  } = {},
 ): Promise<void> {
   await mkdir(rawDir, { recursive: true });
   const name = `${record.taskId}-run${record.run}-${Date.now()}.json`;
   const secrets = options.secrets ?? [];
-  const redacted: AttemptRecord = {
-    ...record,
-    rawModelOutput: redactSecrets(record.rawModelOutput, secrets),
-    failureReason:
-      record.failureReason == null
-        ? null
-        : redactSecrets(record.failureReason, secrets),
-    retries: record.retries.map((r) => ({
-      ...r,
-      message: redactSecrets(r.message, secrets),
-    })),
-  };
-  const json = redactSecrets(JSON.stringify(redacted, null, 2) + "\n", secrets);
+  const redacted = scrubAttemptRecord(record, secrets, options.repoRoot);
+  const json = redactSecrets(
+    JSON.stringify(redacted, null, 2) + "\n",
+    secrets,
+    options.repoRoot,
+  );
   assertNoKeyLeak(json);
   const body = writePrefix(options) + json;
   await writeFile(join(rawDir, name), body, "utf8");
@@ -181,7 +243,12 @@ export async function writeAggregates(
   resultsDir: string,
   label: string,
   aggregate: AggregateResult,
-  options: { stub?: boolean; incomplete?: boolean; secrets?: string[] } = {},
+  options: {
+    stub?: boolean;
+    incomplete?: boolean;
+    secrets?: string[];
+    repoRoot?: string;
+  } = {},
 ): Promise<{ jsonPath: string; mdPath: string }> {
   await mkdir(resultsDir, { recursive: true });
   const jsonPath = join(resultsDir, `${label}.json`);
@@ -189,24 +256,22 @@ export async function writeAggregates(
   const secrets = options.secrets ?? [];
   const safeAgg: AggregateResult = {
     ...aggregate,
+    docsPath: sanitizeAbsolutePaths(aggregate.docsPath, options.repoRoot),
     incomplete: options.incomplete || aggregate.incomplete,
     incompleteReason: options.incomplete
       ? INCOMPLETE_BANNER
       : aggregate.incompleteReason,
-    attempts: aggregate.attempts.map((a) => ({
-      ...a,
-      rawModelOutput: redactSecrets(a.rawModelOutput, secrets),
-      failureReason:
-        a.failureReason == null ? null : redactSecrets(a.failureReason, secrets),
-      retries: a.retries.map((r) => ({
-        ...r,
-        message: redactSecrets(r.message, secrets),
-      })),
-    })),
+    attempts: aggregate.attempts.map((a) =>
+      scrubAttemptRecord(a, secrets, options.repoRoot),
+    ),
   };
-  const json = redactSecrets(JSON.stringify(safeAgg, null, 2) + "\n", secrets);
+  const json = redactSecrets(
+    JSON.stringify(safeAgg, null, 2) + "\n",
+    secrets,
+    options.repoRoot,
+  );
   assertNoKeyLeak(json);
-  const md = redactSecrets(renderMarkdown(safeAgg), secrets);
+  const md = redactSecrets(renderMarkdown(safeAgg), secrets, options.repoRoot);
   assertNoKeyLeak(md);
   const prefix = writePrefix(options);
   await writeFile(jsonPath, prefix + json, "utf8");

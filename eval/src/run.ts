@@ -37,6 +37,7 @@ import {
   nextConsecutiveErrors,
   redactSecrets,
   resolveOutputDirs,
+  toRepoRelativeDocsPath,
   writeAggregates,
   writeRawAttempt,
   type AttemptRecord,
@@ -212,7 +213,7 @@ async function createLiveProvider(
 }
 
 function safeLog(line: string, secrets: string[]): void {
-  console.log(redactSecrets(line, secrets));
+  console.log(redactSecrets(line, secrets, REPO_ROOT));
 }
 
 async function main(): Promise<void> {
@@ -340,7 +341,7 @@ async function main(): Promise<void> {
         const completed = await completeWithRetry(provider, systemPrompt, user);
         retries = completed.retries.map((r) => ({
           ...r,
-          message: redactSecrets(r.message, secrets),
+          message: redactSecrets(r.message, secrets, REPO_ROOT),
         }));
         rawText = completed.result.text;
         inputTokens = completed.result.inputTokens;
@@ -365,8 +366,10 @@ async function main(): Promise<void> {
       }
 
       failureReason =
-        failureReason == null ? null : redactSecrets(failureReason, secrets);
-      rawText = redactSecrets(rawText, secrets);
+        failureReason == null
+          ? null
+          : redactSecrets(failureReason, secrets, REPO_ROOT);
+      rawText = redactSecrets(rawText, secrets, REPO_ROOT);
 
       const { usd, missingPrice } = estimateCostUsd(
         pricing,
@@ -396,13 +399,13 @@ async function main(): Promise<void> {
         retries,
         contextMode: opts.context,
         topK: opts.context === "rag" ? opts.topK : null,
-        docsPath: opts.docsDir,
+        docsPath: toRepoRelativeDocsPath(REPO_ROOT, opts.docsDir),
         docsCorpusHash,
         retrieved,
         contextChars,
       };
       attempts.push(record);
-      await writeRawAttempt(rawDir, record, { stub, secrets });
+      await writeRawAttempt(rawDir, record, { stub, secrets, repoRoot: REPO_ROOT });
       safeLog(
         `${task.id} run ${run}: ${outcome.toUpperCase()}${
           failureReason ? ` — ${failureReason}` : ""
@@ -439,6 +442,7 @@ async function main(): Promise<void> {
     stub,
     incomplete: stoppedEarly,
     secrets,
+    repoRoot: REPO_ROOT,
   });
   safeLog(`Wrote ${jsonPath}`, secrets);
   safeLog(`Wrote ${mdPath}`, secrets);

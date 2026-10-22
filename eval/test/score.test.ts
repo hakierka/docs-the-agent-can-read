@@ -58,7 +58,7 @@ describe("scoring + stub rendering", () => {
         systemPromptHash: hash,
         contextMode: "full" as const,
         topK: null,
-        docsPath: "/synth",
+        docsPath: "synth",
         docsCorpusHash: "h",
         retrieved: [],
         contextChars: 0,

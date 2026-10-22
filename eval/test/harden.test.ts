@@ -14,6 +14,8 @@ import {
   nextConsecutiveErrors,
   redactSecrets,
   resolveOutputDirs,
+  sanitizeAbsolutePaths,
+  toRepoRelativeDocsPath,
   writeAggregates,
   writeRawAttempt,
   type AttemptRecord,
@@ -58,7 +60,7 @@ function attempt(
     systemPromptHash: "h",
     contextMode: "full" as const,
     topK: null,
-    docsPath: "/synth",
+    docsPath: "synth",
     docsCorpusHash: "h",
     retrieved: [],
     contextChars: 0,
@@ -170,6 +172,48 @@ describe("circuit breaker", () => {
   });
 });
 
+describe("relative docs paths + absolute path sanitization", () => {
+  it("toRepoRelativeDocsPath strips the repo root", () => {
+    const root = "/repo/root";
+    expect(toRepoRelativeDocsPath(root, "/repo/root/docs/src/content/docs")).toBe(
+      "docs/src/content/docs",
+    );
+    expect(toRepoRelativeDocsPath(root, "docs-v2")).toBe("docs-v2");
+  });
+
+  it("sanitizeAbsolutePaths replaces a fake absolute path", () => {
+    const fake = "/Users/someone/Projects/secret-box/docs/src/content/docs";
+    const cleaned = sanitizeAbsolutePaths(`Docs: ${fake} and again ${fake}`);
+    expect(cleaned).not.toContain("/Users/");
+    expect(cleaned).not.toContain("someone");
+    expect(cleaned).toContain("[PATH]");
+  });
+
+  it("written results never contain an absolute docs path", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eval-relpath-"));
+    const absDocs = "/Users/fakeuser/Projects/docs-the-agent-can-read/docs/src/content/docs";
+    try {
+      const record = attempt({
+        taskId: "T1",
+        run: 1,
+        outcome: "error",
+        failureReason: `failed reading ${absDocs}`,
+        docsPath: absDocs,
+      });
+      await writeRawAttempt(dir, record, {
+        repoRoot: "/Users/fakeuser/Projects/docs-the-agent-can-read",
+      });
+      const files = await readdir(dir);
+      const body = await readFile(join(dir, files[0]!), "utf8");
+      expect(body).not.toContain("/Users/");
+      expect(body).not.toContain("fakeuser");
+      expect(body).toMatch(/\[PATH\]|docs\/src\/content\/docs/);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 describe("API key redaction", () => {
   it("redacts secret value from strings", () => {
     const key = "super-secret-test-key-xyz";
@@ -206,7 +250,7 @@ describe("API key redaction", () => {
         runsPerTask: 1,
         contextMode: "full",
         topK: null,
-        docsPath: "/synth",
+        docsPath: "synth",
         docsCorpusHash: "h",
         tasks: [],
         overallPasses: 0,
@@ -227,6 +271,7 @@ describe("API key redaction", () => {
       expect(json).not.toContain(key);
       expect(md).not.toContain(key);
       expect(json).toContain("[REDACTED]");
+      expect(json).not.toMatch(/\/Users\//);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
