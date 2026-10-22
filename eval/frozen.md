@@ -19,9 +19,9 @@ docs v1 was last changed in `c1c5366`, which is before the baseline run, so v1-r
 | `eval/src/context.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
 | `eval/src/check.ts` | `e6fe6cac9bdd453d500bf5e2e06bacfbaf9eb0e5` |
 | `eval/src/docs.ts` | `7de9a6e4a2c42bb25da2ac493f0a1a9bad14f9cb` |
-| `eval/src/run.ts` | `0dac473fb0223b985d1f2f2e1ecb783ad1af9f93` |
+| `eval/src/run.ts` | `bbc92d5c31b64c5ac4e963b9c1d7305b539cc5e1` |
 | `eval/src/model.ts` | `868c72780cc64731a7b16f11b1642d34bfb8e2cf` |
-| `eval/src/provider.ts` | `7f411fede3dd8fe9175070ad7151844bbcd12f9f` |
+| `eval/src/provider.ts` | `bbc92d5c31b64c5ac4e963b9c1d7305b539cc5e1` |
 | `eval/src/score.ts` | `e6fe6cac9bdd453d500bf5e2e06bacfbaf9eb0e5` |
 | `eval/src/results.ts` | `0dac473fb0223b985d1f2f2e1ecb783ad1af9f93` |
 | `eval/package.json` | `4a66d01f808ec090962bbc190d62c3b5df7b8be0` |
@@ -74,6 +74,8 @@ Shared settings for every live condition below:
 
 `delay-ms` and retry backoff are operational parameters, not inputs to the result; the planned delay is raised from 2000 to 6000 ms because of the 429.
 
+The per-minute quota is 15; at `--delay-ms 6000` the run makes about 10 requests per minute.
+
 | Label | Docs path | Context mode | top-k | Exact command |
 |-------|-----------|--------------|-------|---------------|
 | `v1-rag` | `docs/src/content/docs` (default) | `rag` | `3` | `npx tsx src/run.ts --label v1-rag --context rag --top-k 3 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 6000 --hard-cap 50` |
@@ -95,7 +97,7 @@ Facts from `results/incomplete/v1-rag-attempt1.json` (read-only):
 - **Attempts scored before stop:** 21 (pass/fail only; errors excluded from the scored count). **24** attempt records were written in total (21 scored + 3 T8 errors).
 - **Tasks reached:** T1–T8 (T9–T10 never started).
 - **Tasks with scored runs:** T1–T7 (T8 had errors only, scoredRuns 0).
-- **Provider retries on 429:** 0 (`retries` arrays empty on the T8 records). The three T8 attempts each failed immediately with 429 (no in-attempt retry succeeded).
+- Retry records are not available for this attempt: the harness recorded retries only for calls that finally succeeded (fixed in `bbc92d5c31b64c5ac4e963b9c1d7305b539cc5e1`). Each T8 attempt made up to 3 requests (1 request + 2 retries) before it was classified as error; the free-tier quota is 15 requests per minute for this model.
 - **Quota named:** `GenerateRequestsPerMinutePerProjectPerModel-FreeTier` (free-tier **per-minute** request quota), metric `generativelanguage.googleapis.com/generate_content_free_tier_requests`, limit **15**, model `gemini-3.5-flash-lite`.
 - **Exact rate-limit error text** (no API key present; not redacted):
 
