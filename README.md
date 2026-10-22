@@ -1,6 +1,6 @@
-# cat-status
+# Docs the agent can read
 
-Small CLI that maps an HTTP status code to a [http.cat](https://http.cat) image URL. Optional: save the image to a file.
+A small experiment on writing documentation that AI assistants can use.
 
 ## Why this exists
 
@@ -18,6 +18,10 @@ Then I gave a model 10 small tasks, for example "save the image for status 503, 
 **What happened:** when the model saw all the docs, both versions worked. When it saw only the 3 best-matching sections, v1 failed 2 tasks out of 10 and v2 passed all 10. Giving v1 more sections did not fix it. The problem was where the facts were placed, not how smart the model was.
 
 **How much to trust it:** this is a small case study, not proof. It is one tool, one model and 10 tasks. I wrote down the inputs and the rules before each run, and I list below what went wrong along the way.
+
+## The tool in the test
+
+Small CLI that maps an HTTP status code to a [http.cat](https://http.cat) image URL. Optional: save the image to a file.
 
 This repo is a docs demo. The CLI, offline tests, human docs, and an optional local eval harness live here. CI never calls the LLM.
 
@@ -82,6 +86,17 @@ Sections are cut at `##` and `###` headings and ranked with BM25 against the tas
 - v2 passes both tasks. In v2 each of these facts is stated again inside one section, together with the command form and the exit codes.
 - Control: giving v1 twice as many sections (1.6 times the tokens) did not fix either task. v2 with 3 sections uses about 1.9 times the tokens of v1 with 3 sections, so the control is close to token-matched but not equal (it used 86% of the v2 tokens).
 - The three runs of each task had the same outcome in every condition. Counted honestly, the evidence is 10 tasks, not 30 attempts.
+
+### One task, side by side
+
+Task T5: "Save the image for status 503 to a.jpg, but give up after 2 seconds if the download is too slow."
+
+| Docs | Sections the model saw | Command it wrote | Result |
+|------|------------------------|------------------|--------|
+| v1 | `quick-start`, `command-reference--flags--save-path`, `changelog--1-0-0` | `cat-status 503 --save a.jpg --timeout 2` | fail: `--timeout` takes milliseconds, so this is 2 ms |
+| v2 | `lookup--reject-unknown-or-no-image-codes`, `lookup--reject-codes-outside-100-599`, `save--set-a-download-timeout` | `cat-status 503 --save a.jpg --timeout 2000` | pass |
+
+This is run 1 of 3; the pass or fail was the same in all three runs. v2 also retrieved two sections it did not need. It passed because the one it needed, the timeout section, was among the top 3. In v1 the section with the unit was not retrieved at all.
 
 ### What this does not show
 
