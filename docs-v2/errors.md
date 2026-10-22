@@ -23,7 +23,7 @@ cat-status --version
 | 2 | Unknown or invalid status code (including real HTTP statuses with no cat image) |
 | 3 | Download or file-write failed for `--save` |
 
-Errors print one line on stderr. Successful commands leave stderr empty (aside from nothing). Usage and code errors do not print the URL or JSON on stdout.
+Errors print one line on stderr. Successful commands leave stderr empty. Usage and code errors do not print the URL or JSON on stdout.
 
 ## Look up every stderr message
 
@@ -57,7 +57,7 @@ Exact message or pattern, exit code, cause, and fix:
 
 ## Reproduce common usage failures
 
-Commands below use `cat-status` with the flags shown. None of them pair `--list` with `--save` successfully. Stdout is empty for each.
+Commands below use `cat-status` with the flags shown. Stdout is empty for each.
 
 ```bash
 cat-status
