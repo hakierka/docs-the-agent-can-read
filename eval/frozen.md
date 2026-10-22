@@ -139,3 +139,27 @@ Please retry in 9.194102525s.
 | T8 | 3 | error (429) |
 
 No complete `v1-rag`, `v2-rag`, or `v2-full` run has finished. No `v2-rag` or `v2-full` attempt has started.
+
+## (f) Exploratory control, added after the three planned runs
+
+| Field | Value |
+|-------|-------|
+| Label | `v1-rag-k6` |
+| Docs | v1 (`docs/src/content/docs`) |
+| Context | `rag`, top-k **6** |
+| Model | `gemini-3.5-flash-lite` |
+| Temperature | `0` |
+| Thinking | `minimal` |
+| Tasks × runs | 10 × 3 |
+| Delay | `6000` ms |
+| Retriever / chunker | same as planned rag runs |
+
+**Reason:** v2-rag used about 1.9× the input tokens of v1-rag (31,923 vs 17,148 actual), so a v1 run with a larger top-k tests whether v2's advantage is only more context; top-k 6 gives roughly the token count of v2-rag.
+
+**Statement written BEFORE the run:** I do not know whether top-k 6 fixes T5 and T8 on v1. I report the result either way. This condition is exploratory and was added after I had seen the results of the three planned runs.
+
+**Exact command** (from `eval/`):
+
+```bash
+npx tsx src/run.ts --label v1-rag-k6 --context rag --top-k 6 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 6000 --hard-cap 50
+```
