@@ -2,6 +2,10 @@
 
 Recorded so planned `v1-rag` / `v2-rag` / `v2-full` runs can be checked against fixed inputs.
 
+## History note
+
+The first freeze commit (`2f2c3fe`, extended in `cbd4ede`) had a loader gap: `--docs ../docs-v2` loaded only `install.md` and `changelog.md`. Found before any v2 run. Fixed in `7de9a6e4a2c42bb25da2ac493f0a1a9bad14f9cb`. No real run of v1-rag, v2-rag or v2-full had happened.
+
 ## (a) Last commit that changed each path
 
 docs v1 was last changed in `c1c5366`, which is before the baseline run, so v1-rag uses the same v1 docs as the baseline.
@@ -14,7 +18,7 @@ docs v1 was last changed in `c1c5366`, which is before the baseline run, so v1-r
 | `eval/src/bm25.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
 | `eval/src/context.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
 | `eval/src/check.ts` | `e6fe6cac9bdd453d500bf5e2e06bacfbaf9eb0e5` |
-| `eval/src/docs.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
+| `eval/src/docs.ts` | `7de9a6e4a2c42bb25da2ac493f0a1a9bad14f9cb` |
 | `eval/src/run.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
 | `eval/src/model.ts` | `868c72780cc64731a7b16f11b1642d34bfb8e2cf` |
 | `eval/src/provider.ts` | `7f411fede3dd8fe9175070ad7151844bbcd12f9f` |
@@ -29,25 +33,31 @@ docs v1 was last changed in `c1c5366`, which is before the baseline run, so v1-r
 
 ## (b) Corpus SHA-256 (`hashDocsSources` only; no retriever)
 
-Computed with the runner’s `hashDocsSources` the same way `eval/src/run.ts` calls it (`docsRoot` = repo `docs/`).
+File-provenance hashes via the runner’s `hashDocsSources` (sorted relative path + UTF-8 bytes). When `docsContentDir` contains `llms.txt`, every linked page plus `llms.txt` is hashed (v1 `DOCS_PAGE_ORDER` names do not apply).
 
 | Corpus | Docs path passed to hasher | SHA-256 |
 |--------|----------------------------|---------|
 | docs v1 | `docs/src/content/docs` | `50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f` |
-| docs v2 | `docs-v2` | `9c4bf1754c8322a9b0034ac63d431b520efc4646706c0807b9c1000ef0a53533` |
+| docs v2 | `docs-v2` | `78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88` |
 
-### Files covered by each corpus hash
+### Golden v1 full-mode corpus *string* hash
 
-`hashDocsSources` hashes raw UTF-8 bytes of every file it finds under the fixed `DOCS_PAGE_ORDER` list in `docsContentDir`, plus `llms.txt` if present under `docsRoot` (sorted by relative path).
+SHA-256 of the exact concatenated corpus string `loadDocsCorpus` produces for v1 (the text that goes into the model message), captured before the docs-v2 loader fix:
 
-- **docs v1 hash** covers: `index.mdx`, `install.md`, `quick-start.md`, `command-reference.md`, `troubleshooting.md`, `changelog.md`. No `llms.txt` (v1 has none).
-- **docs v2 hash** (with `--docs ../docs-v2` and runner `docsRoot=docs/`) covers only the `DOCS_PAGE_ORDER` filenames that exist in `docs-v2/`: `install.md`, `changelog.md`. It does **not** include other `docs-v2/*.md` pages, and it does **not** include `docs-v2/llms.txt` (runner looks for `llms.txt` under repo `docs/`, which has none).
+- SHA-256: `59c0e39eb467cdb6a53ff8e4a85f8b960b6b728038a243529dc3a378d7c1ae21`
+- Character count: `6476`
+- Constants: `V1_FULL_CORPUS_SHA256` / `V1_FULL_CORPUS_CHARS` in `eval/src/docs.ts`
+
+### Files covered by each corpus file-hash
+
+- **docs v1** (`50cb7410…b28f`): `index.mdx`, `install.md`, `quick-start.md`, `command-reference.md`, `troubleshooting.md`, `changelog.md`. No `llms.txt` (v1 has none).
+- **docs v2** (`78e4e89b…df88`): `changelog.md`, `errors.md`, `flags.md`, `index.md`, `install.md`, `json.md`, `list.md`, `llms.txt`, `lookup.md`, `non-standard.md`, `save.md` (all `docs-v2` pages listed in `llms.txt`, plus `llms.txt` itself).
 
 ## Corpus composition
 
 - **v1-full (baseline)** = v1 pages, no `llms.txt` (v1 has none).
 - **v1-rag index** = v1 pages split into sections.
-- **v2-full** = all `docs-v2` pages PLUS `llms.txt`.
+- **v2-full** = `llms.txt` first, then all `docs-v2` pages in `llms.txt` link order.
 - **v2-rag index** = `docs-v2/*.md` sections WITHOUT `llms.txt` and without frontmatter descriptions.
 
 ## (c) Planned runs
