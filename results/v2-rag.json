@@ -1,0 +1,1368 @@
+{
+  "label": "v2-rag",
+  "provider": "google",
+  "model": "gemini-3.5-flash-lite",
+  "temperature": 0,
+  "thinkingSetting": "minimal",
+  "date": "2026-10-22T09:57:18.071Z",
+  "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+  "pricingSourceUrl": "https://ai.google.dev/gemini-api/docs/rate-limits",
+  "pricingLookupDate": "2026-10-22",
+  "runsPerTask": 3,
+  "contextMode": "rag",
+  "topK": 3,
+  "docsPath": "docs-v2",
+  "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+  "tasks": [
+    {
+      "id": "T1",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T2",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T3",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T4",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T5",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T6",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T7",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T8",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T9",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T10",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    }
+  ],
+  "overallPasses": 30,
+  "overallScoredRuns": 30,
+  "overallErrors": 0,
+  "overallPassRate": "30/30",
+  "totalInputTokens": 31923,
+  "totalOutputTokens": 370,
+  "totalThinkingTokens": 0,
+  "totalCostUsd": 0,
+  "attempts": [
+    {
+      "taskId": "T1",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:04.854Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1249,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 8.943692415154525,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        },
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.585397911710114,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "index--map-a-status-code-to-a-http-cat-url",
+          "score": 7.562648165179761,
+          "prefix": "What cat-status does > Map a status code to a http.cat URL"
+        }
+      ],
+      "contextChars": 3335
+    },
+    {
+      "taskId": "T1",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:11.582Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1249,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 8.943692415154525,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        },
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.585397911710114,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "index--map-a-status-code-to-a-http-cat-url",
+          "score": 7.562648165179761,
+          "prefix": "What cat-status does > Map a status code to a http.cat URL"
+        }
+      ],
+      "contextChars": 3335
+    },
+    {
+      "taskId": "T1",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:18.151Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1249,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 8.943692415154525,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        },
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.585397911710114,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "index--map-a-status-code-to-a-http-cat-url",
+          "score": 7.562648165179761,
+          "prefix": "What cat-status does > Map a status code to a http.cat URL"
+        }
+      ],
+      "contextChars": 3335
+    },
+    {
+      "taskId": "T2",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:24.885Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1401,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.617763913911897,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.95780432162736,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "flags--read-the-complete-flag-table",
+          "score": 5.660674145443007,
+          "prefix": "Flag reference > Read the complete flag table"
+        }
+      ],
+      "contextChars": 3917
+    },
+    {
+      "taskId": "T2",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:31.415Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1401,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.617763913911897,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.95780432162736,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "flags--read-the-complete-flag-table",
+          "score": 5.660674145443007,
+          "prefix": "Flag reference > Read the complete flag table"
+        }
+      ],
+      "contextChars": 3917
+    },
+    {
+      "taskId": "T2",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:37.984Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1401,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "json--print-a-json-object-for-one-known-code",
+          "score": 7.617763913911897,
+          "prefix": "Print JSON for a status code > Print a JSON object for one known code"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.95780432162736,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "flags--read-the-complete-flag-table",
+          "score": 5.660674145443007,
+          "prefix": "Flag reference > Read the complete flag table"
+        }
+      ],
+      "contextChars": 3917
+    },
+    {
+      "taskId": "T3",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:44.665Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1075,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "list--filter-by-status-class",
+          "score": 6.110970098496068,
+          "prefix": "List supported status codes > Filter by status class"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 5.916078307992805,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        },
+        {
+          "chunkId": "list--print-the-list-as-json",
+          "score": 5.475223858199233,
+          "prefix": "List supported status codes > Print the list as JSON"
+        }
+      ],
+      "contextChars": 2913
+    },
+    {
+      "taskId": "T3",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:51.177Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1075,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "list--filter-by-status-class",
+          "score": 6.110970098496068,
+          "prefix": "List supported status codes > Filter by status class"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 5.916078307992805,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        },
+        {
+          "chunkId": "list--print-the-list-as-json",
+          "score": 5.475223858199233,
+          "prefix": "List supported status codes > Print the list as JSON"
+        }
+      ],
+      "contextChars": 2913
+    },
+    {
+      "taskId": "T3",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:54:57.808Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1075,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "list--filter-by-status-class",
+          "score": 6.110970098496068,
+          "prefix": "List supported status codes > Filter by status class"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 5.916078307992805,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        },
+        {
+          "chunkId": "list--print-the-list-as-json",
+          "score": 5.475223858199233,
+          "prefix": "List supported status codes > Print the list as JSON"
+        }
+      ],
+      "contextChars": 2913
+    },
+    {
+      "taskId": "T4",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:04.448Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 993,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 16.50929465745174,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 11.436814503068133,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.054792214436722,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        }
+      ],
+      "contextChars": 2666
+    },
+    {
+      "taskId": "T4",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:11.194Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 993,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 16.50929465745174,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 11.436814503068133,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.054792214436722,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        }
+      ],
+      "contextChars": 2666
+    },
+    {
+      "taskId": "T4",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:17.883Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 993,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 16.50929465745174,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 11.436814503068133,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.054792214436722,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        }
+      ],
+      "contextChars": 2666
+    },
+    {
+      "taskId": "T5",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:24.417Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2000\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 734,
+      "outputTokens": 23,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--reject-unknown-or-no-image-codes",
+          "score": 8.560557812498645,
+          "prefix": "Look up a status code URL > Reject unknown or no-image codes"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 7.8768399696615194,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "save--set-a-download-timeout",
+          "score": 7.773437871494627,
+          "prefix": "Save an image to a file > Set a download timeout"
+        }
+      ],
+      "contextChars": 1647
+    },
+    {
+      "taskId": "T5",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:31.161Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2000\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 734,
+      "outputTokens": 23,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--reject-unknown-or-no-image-codes",
+          "score": 8.560557812498645,
+          "prefix": "Look up a status code URL > Reject unknown or no-image codes"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 7.8768399696615194,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "save--set-a-download-timeout",
+          "score": 7.773437871494627,
+          "prefix": "Save an image to a file > Set a download timeout"
+        }
+      ],
+      "contextChars": 1647
+    },
+    {
+      "taskId": "T5",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:37.745Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2000\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 734,
+      "outputTokens": 23,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--reject-unknown-or-no-image-codes",
+          "score": 8.560557812498645,
+          "prefix": "Look up a status code URL > Reject unknown or no-image codes"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 7.8768399696615194,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "save--set-a-download-timeout",
+          "score": 7.773437871494627,
+          "prefix": "Save an image to a file > Set a download timeout"
+        }
+      ],
+      "contextChars": 1647
+    },
+    {
+      "taskId": "T6",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:44.449Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 626,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--pass-a-leading-dash-with",
+          "score": 5.68206522991184,
+          "prefix": "Look up a status code URL > Pass a leading dash with --"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 4.85375933057448,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "lookup--reject-bad-code-formats",
+          "score": 4.603553619325477,
+          "prefix": "Look up a status code URL > Reject bad code formats"
+        }
+      ],
+      "contextChars": 1374
+    },
+    {
+      "taskId": "T6",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:51.100Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 626,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--pass-a-leading-dash-with",
+          "score": 5.68206522991184,
+          "prefix": "Look up a status code URL > Pass a leading dash with --"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 4.85375933057448,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "lookup--reject-bad-code-formats",
+          "score": 4.603553619325477,
+          "prefix": "Look up a status code URL > Reject bad code formats"
+        }
+      ],
+      "contextChars": 1374
+    },
+    {
+      "taskId": "T6",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:55:57.687Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 626,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "lookup--pass-a-leading-dash-with",
+          "score": 5.68206522991184,
+          "prefix": "Look up a status code URL > Pass a leading dash with --"
+        },
+        {
+          "chunkId": "lookup--reject-codes-outside-100-599",
+          "score": 4.85375933057448,
+          "prefix": "Look up a status code URL > Reject codes outside 100–599"
+        },
+        {
+          "chunkId": "lookup--reject-bad-code-formats",
+          "score": 4.603553619325477,
+          "prefix": "Look up a status code URL > Reject bad code formats"
+        }
+      ],
+      "contextChars": 1374
+    },
+    {
+      "taskId": "T7",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:04.197Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 868,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 10.442274156208976,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.8205808928125,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "errors--reproduce-common-code-failures",
+          "score": 5.194995830478042,
+          "prefix": "Exit codes and errors > Reproduce common code failures"
+        }
+      ],
+      "contextChars": 2160
+    },
+    {
+      "taskId": "T7",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:10.792Z",
+      "rawModelOutput": "{\"answer\":2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 868,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 10.442274156208976,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.8205808928125,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "errors--reproduce-common-code-failures",
+          "score": 5.194995830478042,
+          "prefix": "Exit codes and errors > Reproduce common code failures"
+        }
+      ],
+      "contextChars": 2160
+    },
+    {
+      "taskId": "T7",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:17.496Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 868,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 10.442274156208976,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "changelog--read-what-shipped-in-1-0-0",
+          "score": 5.8205808928125,
+          "prefix": "Changelog > Read what shipped in 1.0.0"
+        },
+        {
+          "chunkId": "errors--reproduce-common-code-failures",
+          "score": 5.194995830478042,
+          "prefix": "Exit codes and errors > Reproduce common code failures"
+        }
+      ],
+      "contextChars": 2160
+    },
+    {
+      "taskId": "T8",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:24.101Z",
+      "rawModelOutput": "{\"answer\": 1}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1749,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 6.182975144278944,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "errors--look-up-every-stderr-message",
+          "score": 5.487495377159551,
+          "prefix": "Exit codes and errors > Look up every stderr message"
+        },
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 5.1562379079651866,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        }
+      ],
+      "contextChars": 5287
+    },
+    {
+      "taskId": "T8",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:30.862Z",
+      "rawModelOutput": "{\"answer\":1}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1749,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 6.182975144278944,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "errors--look-up-every-stderr-message",
+          "score": 5.487495377159551,
+          "prefix": "Exit codes and errors > Look up every stderr message"
+        },
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 5.1562379079651866,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        }
+      ],
+      "contextChars": 5287
+    },
+    {
+      "taskId": "T8",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:37.798Z",
+      "rawModelOutput": "{\"answer\": 1}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 1749,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "index--accept-only-codes-that-have-a-cat-image",
+          "score": 6.182975144278944,
+          "prefix": "What cat-status does > Accept only codes that have a cat image"
+        },
+        {
+          "chunkId": "errors--look-up-every-stderr-message",
+          "score": 5.487495377159551,
+          "prefix": "Exit codes and errors > Look up every stderr message"
+        },
+        {
+          "chunkId": "lookup--print-the-image-url-for-a-known-code",
+          "score": 5.1562379079651866,
+          "prefix": "Look up a status code URL > Print the image URL for a known code"
+        }
+      ],
+      "contextChars": 5287
+    },
+    {
+      "taskId": "T9",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:44.625Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 961,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "non-standard--know-which-codes-are-non-standard",
+          "score": 11.807975008321705,
+          "prefix": "Understand non-standard codes > Know which codes are non-standard"
+        },
+        {
+          "chunkId": "index--mark-a-few-non-standard-product-codes",
+          "score": 8.58706018594869,
+          "prefix": "What cat-status does > Mark a few non-standard product codes"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 7.085310981376713,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        }
+      ],
+      "contextChars": 2617
+    },
+    {
+      "taskId": "T9",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:51.269Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 961,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "non-standard--know-which-codes-are-non-standard",
+          "score": 11.807975008321705,
+          "prefix": "Understand non-standard codes > Know which codes are non-standard"
+        },
+        {
+          "chunkId": "index--mark-a-few-non-standard-product-codes",
+          "score": 8.58706018594869,
+          "prefix": "What cat-status does > Mark a few non-standard product codes"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 7.085310981376713,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        }
+      ],
+      "contextChars": 2617
+    },
+    {
+      "taskId": "T9",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:56:57.859Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 961,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "non-standard--know-which-codes-are-non-standard",
+          "score": 11.807975008321705,
+          "prefix": "Understand non-standard codes > Know which codes are non-standard"
+        },
+        {
+          "chunkId": "index--mark-a-few-non-standard-product-codes",
+          "score": 8.58706018594869,
+          "prefix": "What cat-status does > Mark a few non-standard product codes"
+        },
+        {
+          "chunkId": "non-standard--see-the-label-in-plain-list-output",
+          "score": 7.085310981376713,
+          "prefix": "Understand non-standard codes > See the label in plain --list output"
+        }
+      ],
+      "contextChars": 2617
+    },
+    {
+      "taskId": "T10",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:57:04.762Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 985,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 15.713958914561168,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.27193086857656,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 6.058037034713317,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        }
+      ],
+      "contextChars": 2666
+    },
+    {
+      "taskId": "T10",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:57:11.286Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 985,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 15.713958914561168,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.27193086857656,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 6.058037034713317,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        }
+      ],
+      "contextChars": 2666
+    },
+    {
+      "taskId": "T10",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:57:18.069Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 985,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs-v2",
+      "docsCorpusHash": "78e4e89bb00bac36415a308fb459aea5db7883b6bb36e2b23e7e287a7e4cdf88",
+      "retrieved": [
+        {
+          "chunkId": "save--overwrite-an-existing-file-with-force",
+          "score": 15.713958914561168,
+          "prefix": "Save an image to a file > Overwrite an existing file with --force"
+        },
+        {
+          "chunkId": "save--download-the-image-for-a-known-code",
+          "score": 9.27193086857656,
+          "prefix": "Save an image to a file > Download the image for a known code"
+        },
+        {
+          "chunkId": "save--handle-download-and-write-failures",
+          "score": 6.058037034713317,
+          "prefix": "Save an image to a file > Handle download and write failures"
+        }
+      ],
+      "contextChars": 2666
+    }
+  ]
+}

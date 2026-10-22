@@ -1,0 +1,1368 @@
+{
+  "label": "v1-rag",
+  "provider": "google",
+  "model": "gemini-3.5-flash-lite",
+  "temperature": 0,
+  "thinkingSetting": "minimal",
+  "date": "2026-10-22T09:53:34.548Z",
+  "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+  "pricingSourceUrl": "https://ai.google.dev/gemini-api/docs/rate-limits",
+  "pricingLookupDate": "2026-10-22",
+  "runsPerTask": 3,
+  "contextMode": "rag",
+  "topK": 3,
+  "docsPath": "docs/src/content/docs",
+  "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+  "tasks": [
+    {
+      "id": "T1",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T2",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T3",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T4",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T5",
+      "passes": 0,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "0/3",
+      "passRate": "0/3"
+    },
+    {
+      "id": "T6",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T7",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T8",
+      "passes": 0,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "0/3",
+      "passRate": "0/3"
+    },
+    {
+      "id": "T9",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    },
+    {
+      "id": "T10",
+      "passes": 3,
+      "scoredRuns": 3,
+      "errors": 0,
+      "consistency": "3/3",
+      "passRate": "3/3"
+    }
+  ],
+  "overallPasses": 24,
+  "overallScoredRuns": 30,
+  "overallErrors": 0,
+  "overallPassRate": "24/30",
+  "totalInputTokens": 17148,
+  "totalOutputTokens": 362,
+  "totalThinkingTokens": 0,
+  "totalCostUsd": 0,
+  "attempts": [
+    {
+      "taskId": "T1",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:20.175Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 646,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 8.165706833107295,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 8.032785560383669,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.666788355012442,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1592
+    },
+    {
+      "taskId": "T1",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:26.802Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 646,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 8.165706833107295,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 8.032785560383669,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.666788355012442,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1592
+    },
+    {
+      "taskId": "T1",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:33.564Z",
+      "rawModelOutput": "{\"command\":\"cat-status 404\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 646,
+      "outputTokens": 11,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 8.165706833107295,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 8.032785560383669,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.666788355012442,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1592
+    },
+    {
+      "taskId": "T2",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:40.133Z",
+      "rawModelOutput": "{\"command\":\"cat-status --json 418\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 547,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 5.989609824287884,
+          "prefix": "Changelog > 1.0.0"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 5.952976607072621,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 5.705622626085793,
+          "prefix": "Command reference > Arguments > `<code>`"
+        }
+      ],
+      "contextChars": 1261
+    },
+    {
+      "taskId": "T2",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:46.739Z",
+      "rawModelOutput": "{\"command\":\"cat-status --json 418\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 547,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 5.989609824287884,
+          "prefix": "Changelog > 1.0.0"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 5.952976607072621,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 5.705622626085793,
+          "prefix": "Command reference > Arguments > `<code>`"
+        }
+      ],
+      "contextChars": 1261
+    },
+    {
+      "taskId": "T2",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:50:53.500Z",
+      "rawModelOutput": "{\"command\":\"cat-status --json 418\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 547,
+      "outputTokens": 13,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 5.989609824287884,
+          "prefix": "Changelog > 1.0.0"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 5.952976607072621,
+          "prefix": "Command reference > Flags > `--json`"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 5.705622626085793,
+          "prefix": "Command reference > Arguments > `<code>`"
+        }
+      ],
+      "contextChars": 1261
+    },
+    {
+      "taskId": "T3",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:00.175Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 557,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 7.917920789634726,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--list-1xx-2xx-3xx-4xx-5xx",
+          "score": 6.443288745047388,
+          "prefix": "Command reference > Flags > `--list [1xx|2xx|3xx|4xx|5xx]`"
+        },
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 4.054653796393722,
+          "prefix": "Command reference > Synopsis"
+        }
+      ],
+      "contextChars": 1179
+    },
+    {
+      "taskId": "T3",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:07.080Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 557,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 7.917920789634726,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--list-1xx-2xx-3xx-4xx-5xx",
+          "score": 6.443288745047388,
+          "prefix": "Command reference > Flags > `--list [1xx|2xx|3xx|4xx|5xx]`"
+        },
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 4.054653796393722,
+          "prefix": "Command reference > Synopsis"
+        }
+      ],
+      "contextChars": 1179
+    },
+    {
+      "taskId": "T3",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:13.676Z",
+      "rawModelOutput": "{\"command\":\"cat-status --list 4xx --json\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 557,
+      "outputTokens": 14,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 7.917920789634726,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--list-1xx-2xx-3xx-4xx-5xx",
+          "score": 6.443288745047388,
+          "prefix": "Command reference > Flags > `--list [1xx|2xx|3xx|4xx|5xx]`"
+        },
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 4.054653796393722,
+          "prefix": "Command reference > Synopsis"
+        }
+      ],
+      "contextChars": 1179
+    },
+    {
+      "taskId": "T4",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:20.294Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 615,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 12.896508465178746,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 7.593962633627735,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.042063418843238,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1468
+    },
+    {
+      "taskId": "T4",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:27.009Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 615,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 12.896508465178746,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 7.593962633627735,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.042063418843238,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1468
+    },
+    {
+      "taskId": "T4",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:33.689Z",
+      "rawModelOutput": "{\"command\":\"cat-status 200 --save cats/ok.jpg --force\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 615,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 12.896508465178746,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 7.593962633627735,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "index",
+          "score": 6.042063418843238,
+          "prefix": "Introduction"
+        }
+      ],
+      "contextChars": 1468
+    },
+    {
+      "taskId": "T5",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:40.351Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2\"}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "parsed.timeoutMs: expected 2000, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 587,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 6.2533222008915725,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 5.79783390752119,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 4.9899207383153845,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1367
+    },
+    {
+      "taskId": "T5",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:47.209Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2\"}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "parsed.timeoutMs: expected 2000, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 587,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 6.2533222008915725,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 5.79783390752119,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 4.9899207383153845,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1367
+    },
+    {
+      "taskId": "T5",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:51:53.906Z",
+      "rawModelOutput": "{\"command\":\"cat-status 503 --save a.jpg --timeout 2\"}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "parsed.timeoutMs: expected 2000, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 587,
+      "outputTokens": 20,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 6.2533222008915725,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 5.79783390752119,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 4.9899207383153845,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1367
+    },
+    {
+      "taskId": "T6",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:00.625Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 552,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--negative-numbers-look-like-options",
+          "score": 7.459181762695966,
+          "prefix": "Troubleshooting > Negative numbers look like options"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 6.897566872092634,
+          "prefix": "Command reference > Arguments > `<code>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 6.311614812231844,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1338
+    },
+    {
+      "taskId": "T6",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:07.244Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 552,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--negative-numbers-look-like-options",
+          "score": 7.459181762695966,
+          "prefix": "Troubleshooting > Negative numbers look like options"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 6.897566872092634,
+          "prefix": "Command reference > Arguments > `<code>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 6.311614812231844,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1338
+    },
+    {
+      "taskId": "T6",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:13.802Z",
+      "rawModelOutput": "{\"command\":\"cat-status -- -1\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 552,
+      "outputTokens": 10,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--negative-numbers-look-like-options",
+          "score": 7.459181762695966,
+          "prefix": "Troubleshooting > Negative numbers look like options"
+        },
+        {
+          "chunkId": "command-reference--arguments--code",
+          "score": 6.897566872092634,
+          "prefix": "Command reference > Arguments > `<code>`"
+        },
+        {
+          "chunkId": "changelog--1-0-0",
+          "score": 6.311614812231844,
+          "prefix": "Changelog > 1.0.0"
+        }
+      ],
+      "contextChars": 1338
+    },
+    {
+      "taskId": "T7",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:20.452Z",
+      "rawModelOutput": "{\"answer\":2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 611,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--real-http-status-with-no-cat-image",
+          "score": 9.45421215207687,
+          "prefix": "Troubleshooting > Real HTTP status with no cat image"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 6.495171382214978,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--exit-codes",
+          "score": 5.639690082171631,
+          "prefix": "Command reference > Exit codes"
+        }
+      ],
+      "contextChars": 1424
+    },
+    {
+      "taskId": "T7",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:27.052Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 611,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--real-http-status-with-no-cat-image",
+          "score": 9.45421215207687,
+          "prefix": "Troubleshooting > Real HTTP status with no cat image"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 6.495171382214978,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--exit-codes",
+          "score": 5.639690082171631,
+          "prefix": "Command reference > Exit codes"
+        }
+      ],
+      "contextChars": 1424
+    },
+    {
+      "taskId": "T7",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:33.698Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 611,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "troubleshooting--real-http-status-with-no-cat-image",
+          "score": 9.45421215207687,
+          "prefix": "Troubleshooting > Real HTTP status with no cat image"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 6.495171382214978,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--exit-codes",
+          "score": 5.639690082171631,
+          "prefix": "Command reference > Exit codes"
+        }
+      ],
+      "contextChars": 1424
+    },
+    {
+      "taskId": "T8",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:40.383Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "answer: expected 1, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 371,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 6.052553607506958,
+          "prefix": "Command reference > Synopsis"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 5.115152531320951,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "troubleshooting--download-timed-out",
+          "score": 4.4817541532933,
+          "prefix": "Troubleshooting > Download timed out"
+        }
+      ],
+      "contextChars": 595
+    },
+    {
+      "taskId": "T8",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:46.945Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "answer: expected 1, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 371,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 6.052553607506958,
+          "prefix": "Command reference > Synopsis"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 5.115152531320951,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "troubleshooting--download-timed-out",
+          "score": 4.4817541532933,
+          "prefix": "Troubleshooting > Download timed out"
+        }
+      ],
+      "contextChars": 595
+    },
+    {
+      "taskId": "T8",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:52:53.564Z",
+      "rawModelOutput": "{\"answer\": 2}",
+      "outcome": "fail",
+      "pass": false,
+      "failureReason": "answer: expected 1, got 2",
+      "finishReason": "STOP",
+      "inputTokens": 371,
+      "outputTokens": 6,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--synopsis",
+          "score": 6.052553607506958,
+          "prefix": "Command reference > Synopsis"
+        },
+        {
+          "chunkId": "troubleshooting--file-already-exists",
+          "score": 5.115152531320951,
+          "prefix": "Troubleshooting > File already exists"
+        },
+        {
+          "chunkId": "troubleshooting--download-timed-out",
+          "score": 4.4817541532933,
+          "prefix": "Troubleshooting > Download timed out"
+        }
+      ],
+      "contextChars": 595
+    },
+    {
+      "taskId": "T9",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:01.040Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 731,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--arguments--non-standard-codes",
+          "score": 6.948036290342101,
+          "prefix": "Command reference > Arguments > Non-standard codes"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 4.880310681831586,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 3.653233067142005,
+          "prefix": "Command reference > Flags > `--json`"
+        }
+      ],
+      "contextChars": 1788
+    },
+    {
+      "taskId": "T9",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:07.592Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 731,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--arguments--non-standard-codes",
+          "score": 6.948036290342101,
+          "prefix": "Command reference > Arguments > Non-standard codes"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 4.880310681831586,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 3.653233067142005,
+          "prefix": "Command reference > Flags > `--json`"
+        }
+      ],
+      "contextChars": 1788
+    },
+    {
+      "taskId": "T9",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:14.407Z",
+      "rawModelOutput": "{\"answer\":\"nginx\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 731,
+      "outputTokens": 5,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "command-reference--arguments--non-standard-codes",
+          "score": 6.948036290342101,
+          "prefix": "Command reference > Arguments > Non-standard codes"
+        },
+        {
+          "chunkId": "quick-start",
+          "score": 4.880310681831586,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--json",
+          "score": 3.653233067142005,
+          "prefix": "Command reference > Flags > `--json`"
+        }
+      ],
+      "contextChars": 1788
+    },
+    {
+      "taskId": "T10",
+      "run": 1,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:21.215Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 499,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 8.253131607495511,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--force",
+          "score": 7.378837481354481,
+          "prefix": "Command reference > Flags > `--force`"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 6.701557954437751,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        }
+      ],
+      "contextChars": 1086
+    },
+    {
+      "taskId": "T10",
+      "run": 2,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:27.873Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 499,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 8.253131607495511,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--force",
+          "score": 7.378837481354481,
+          "prefix": "Command reference > Flags > `--force`"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 6.701557954437751,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        }
+      ],
+      "contextChars": 1086
+    },
+    {
+      "taskId": "T10",
+      "run": 3,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "thinkingSetting": "minimal",
+      "date": "2026-10-22T09:53:34.547Z",
+      "rawModelOutput": "{\"command\":\"cat-status 418 --save teapot.jpg\"}",
+      "outcome": "pass",
+      "pass": true,
+      "failureReason": null,
+      "finishReason": "STOP",
+      "inputTokens": 499,
+      "outputTokens": 16,
+      "thinkingTokens": null,
+      "costUsd": 0,
+      "systemPromptHash": "6cb3c29d5be149bfb89711ce5709594583468a7ce9ddbc6d87de8199a9dd7eeb",
+      "retries": [],
+      "contextMode": "rag",
+      "topK": 3,
+      "docsPath": "docs/src/content/docs",
+      "docsCorpusHash": "50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f",
+      "retrieved": [
+        {
+          "chunkId": "quick-start",
+          "score": 8.253131607495511,
+          "prefix": "Quick start"
+        },
+        {
+          "chunkId": "command-reference--flags--force",
+          "score": 7.378837481354481,
+          "prefix": "Command reference > Flags > `--force`"
+        },
+        {
+          "chunkId": "command-reference--flags--save-path",
+          "score": 6.701557954437751,
+          "prefix": "Command reference > Flags > `--save <path>`"
+        }
+      ],
+      "contextChars": 1086
+    }
+  ]
+}
