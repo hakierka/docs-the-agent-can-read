@@ -19,11 +19,11 @@ docs v1 was last changed in `c1c5366`, which is before the baseline run, so v1-r
 | `eval/src/context.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
 | `eval/src/check.ts` | `e6fe6cac9bdd453d500bf5e2e06bacfbaf9eb0e5` |
 | `eval/src/docs.ts` | `7de9a6e4a2c42bb25da2ac493f0a1a9bad14f9cb` |
-| `eval/src/run.ts` | `ee0473cb47da7194a05b60876fbb821b410e1447` |
+| `eval/src/run.ts` | `0dac473fb0223b985d1f2f2e1ecb783ad1af9f93` |
 | `eval/src/model.ts` | `868c72780cc64731a7b16f11b1642d34bfb8e2cf` |
 | `eval/src/provider.ts` | `7f411fede3dd8fe9175070ad7151844bbcd12f9f` |
 | `eval/src/score.ts` | `e6fe6cac9bdd453d500bf5e2e06bacfbaf9eb0e5` |
-| `eval/src/results.ts` | `b99222239a102cc338363baa2a3a374fe6c77c89` |
+| `eval/src/results.ts` | `0dac473fb0223b985d1f2f2e1ecb783ad1af9f93` |
 | `eval/package.json` | `4a66d01f808ec090962bbc190d62c3b5df7b8be0` |
 | `eval/needed-chunks.md` | `7514a9c9c17d4f83f16ef6d55a375e08d20a4a1f` |
 | `eval/needed-chunks-v2.md` | `a33fab37186cd4151c89bf7627ce0af50a2bece6` |
@@ -68,15 +68,17 @@ Shared settings for every live condition below:
 - temperature: `0`
 - thinking: `minimal` (`--thinking-level minimal`)
 - tasks × runs: 10 × 3
-- delay: `2000` ms (`--delay-ms 2000`)
+- delay: `6000` ms (`--delay-ms 6000`)
 - provider: Google (default)
 - working directory: `eval/`
 
+`delay-ms` and retry backoff are operational parameters, not inputs to the result; the planned delay is raised from 2000 to 6000 ms because of the 429.
+
 | Label | Docs path | Context mode | top-k | Exact command |
 |-------|-----------|--------------|-------|---------------|
-| `v1-rag` | `docs/src/content/docs` (default) | `rag` | `3` | `npx tsx src/run.ts --label v1-rag --context rag --top-k 3 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 2000 --hard-cap 50` |
-| `v2-rag` | `docs-v2` | `rag` | `3` | `npx tsx src/run.ts --label v2-rag --context rag --top-k 3 --docs ../docs-v2 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 2000 --hard-cap 50` |
-| `v2-full` | `docs-v2` | `full` | (n/a) | `npx tsx src/run.ts --label v2-full --context full --docs ../docs-v2 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 2000 --hard-cap 50` |
+| `v1-rag` | `docs/src/content/docs` (default) | `rag` | `3` | `npx tsx src/run.ts --label v1-rag --context rag --top-k 3 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 6000 --hard-cap 50` |
+| `v2-rag` | `docs-v2` | `rag` | `3` | `npx tsx src/run.ts --label v2-rag --context rag --top-k 3 --docs ../docs-v2 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 6000 --hard-cap 50` |
+| `v2-full` | `docs-v2` | `full` | (n/a) | `npx tsx src/run.ts --label v2-full --context full --docs ../docs-v2 --model gemini-3.5-flash-lite --temperature 0 --thinking-level minimal --runs 3 --delay-ms 6000 --hard-cap 50` |
 
 ## (d) Hypothesis and decision rules (before the runs)
 
@@ -86,4 +88,52 @@ If a run is incomplete (circuit breaker, rate limit), I may re-run that same con
 
 ## (e) Status at this commit
 
-No real run of v1-rag, v2-rag or v2-full has happened at the time of this commit.
+One real **v1-rag** attempt ran on **2026-10-22** starting at **`2026-10-22T09:14:02.018Z`**, using the same v1 docs corpus as the golden file-hash `50cb7410a9b56472f205e3da0fe06417b451e314e66b99f30d1cba59f995b28f` (and the same BM25 / heading chunker retriever). It was **aborted at T8** by the circuit breaker after **3 consecutive HTTP 429** errors. Artifact files are kept locally under `results/incomplete/` (gitignored; not published). Per rule (d), the same condition will be re-run unchanged.
+
+Facts from `results/incomplete/v1-rag-attempt1.json` (read-only):
+
+- **Attempts scored before stop:** 21 (pass/fail only; errors excluded from the scored count). **24** attempt records were written in total (21 scored + 3 T8 errors).
+- **Tasks reached:** T1–T8 (T9–T10 never started).
+- **Tasks with scored runs:** T1–T7 (T8 had errors only, scoredRuns 0).
+- **Provider retries on 429:** 0 (`retries` arrays empty on the T8 records). The three T8 attempts each failed immediately with 429 (no in-attempt retry succeeded).
+- **Quota named:** `GenerateRequestsPerMinutePerProjectPerModel-FreeTier` (free-tier **per-minute** request quota), metric `generativelanguage.googleapis.com/generate_content_free_tier_requests`, limit **15**, model `gemini-3.5-flash-lite`.
+- **Exact rate-limit error text** (no API key present; not redacted):
+
+```text
+You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite
+Please retry in 9.194102525s.
+```
+
+(T8 runs 2 and 3 used the same message with retry delays `3.590861627s` and `58.011291001s`.)
+
+- **Outcome per attempt:**
+
+| Task | Run | Outcome |
+|------|-----|---------|
+| T1 | 1 | pass |
+| T1 | 2 | pass |
+| T1 | 3 | pass |
+| T2 | 1 | pass |
+| T2 | 2 | pass |
+| T2 | 3 | pass |
+| T3 | 1 | pass |
+| T3 | 2 | pass |
+| T3 | 3 | pass |
+| T4 | 1 | pass |
+| T4 | 2 | pass |
+| T4 | 3 | pass |
+| T5 | 1 | fail |
+| T5 | 2 | fail |
+| T5 | 3 | fail |
+| T6 | 1 | pass |
+| T6 | 2 | pass |
+| T6 | 3 | pass |
+| T7 | 1 | pass |
+| T7 | 2 | pass |
+| T7 | 3 | pass |
+| T8 | 1 | error (429) |
+| T8 | 2 | error (429) |
+| T8 | 3 | error (429) |
+
+No complete `v1-rag`, `v2-rag`, or `v2-full` run has finished. No `v2-rag` or `v2-full` attempt has started.
