@@ -39,7 +39,7 @@ Command:
 cat-status <code> --save <path> --force [--timeout <ms>] [--json]
 ```
 
-`--force` is only valid with `--save`. Without `--force`, an existing path fails before download completes usefully for the caller.
+`--force` is only valid with `--save`. Without `--force`, the CLI checks the path first and stops before any download starts.
 
 Refuse without `--force`:
 
