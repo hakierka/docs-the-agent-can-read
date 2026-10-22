@@ -4,9 +4,18 @@ import { stdin as input, stdout as output } from "node:process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { estimateCostUsd, loadPricing } from "./cost.js";
-import { defaultDocsContentDir, loadDocsCorpus } from "./docs.js";
 import {
-  buildUserMessage,
+  buildContextUserMessage,
+  validateContextFlags,
+  type ContextMode,
+} from "./context.js";
+import {
+  defaultDocsContentDir,
+  hashDocsSources,
+  loadDocsCorpus,
+  loadDocsPages,
+} from "./docs.js";
+import {
   createAnthropicModel,
   createStubModel,
   loadSystemPrompt,
@@ -45,6 +54,7 @@ const DEFAULT_HARD_CAP = 50;
 export const DEFAULT_DELAY_MS = 2000;
 const DEFAULT_GOOGLE_MODEL = "gemini-3.5-flash-lite";
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-5-5";
+const DEFAULT_TOP_K = 3;
 
 type CliOptions = {
   docsDir: string;
@@ -59,11 +69,14 @@ type CliOptions = {
   thinkingLevel: string;
   yes: boolean;
   taskIds: string[] | null;
+  context: ContextMode;
+  topK: number;
 };
 
 function parseCli(argv: string[]): CliOptions {
   let provider: ProviderName = "google";
   let modelExplicit = false;
+  let contextRaw = "full";
   const opts: CliOptions = {
     docsDir: defaultDocsContentDir(REPO_ROOT),
     provider: "google",
@@ -77,6 +90,8 @@ function parseCli(argv: string[]): CliOptions {
     thinkingLevel: "minimal",
     yes: false,
     taskIds: null,
+    context: "full",
+    topK: DEFAULT_TOP_K,
   };
 
   for (let i = 2; i < argv.length; i++) {
@@ -138,8 +153,22 @@ function parseCli(argv: string[]): CliOptions {
       opts.taskIds = parseTaskIds(argv[++i]!);
       continue;
     }
+    if (a === "--context") {
+      contextRaw = argv[++i]!;
+      continue;
+    }
+    if (a === "--top-k") {
+      opts.topK = Number(argv[++i]);
+      continue;
+    }
     throw new Error(`unknown option: ${a}`);
   }
+
+  const ctx = validateContextFlags({ context: contextRaw, topK: opts.topK });
+  if (!ctx.ok) {
+    throw new Error(ctx.reason);
+  }
+  opts.context = ctx.context;
 
   if (opts.dryRun) {
     opts.provider = "stub";
@@ -218,9 +247,14 @@ async function main(): Promise<void> {
   const { text: systemPrompt, hash: systemPromptHash } = await loadSystemPrompt(
     join(EVAL_ROOT, "system-prompt.txt"),
   );
-  const docsCorpus = await loadDocsCorpus(opts.docsDir, join(REPO_ROOT, "docs"));
+  const docsRoot = join(REPO_ROOT, "docs");
+  const docsCorpus = await loadDocsCorpus(opts.docsDir, docsRoot);
+  const docsPages = await loadDocsPages(opts.docsDir, docsRoot);
+  const docsCorpusHash = await hashDocsSources(opts.docsDir, docsRoot);
 
-  const approxInPerCall = Math.ceil((systemPrompt.length + docsCorpus.length + 200) / 4);
+  const approxContext =
+    opts.context === "full" ? docsCorpus.length : Math.ceil(docsCorpus.length / 4);
+  const approxInPerCall = Math.ceil((systemPrompt.length + approxContext + 200) / 4);
   const approxOutPerCall = 40;
   const estIn = approxInPerCall * plannedCalls;
   const estOut = approxOutPerCall * plannedCalls;
@@ -246,6 +280,9 @@ async function main(): Promise<void> {
 
   console.log(`Provider: ${opts.dryRun ? "stub" : opts.provider}`);
   console.log(`Model: ${opts.dryRun ? "stub-dry-run" : opts.model}`);
+  console.log(`Context: ${opts.context}${opts.context === "rag" ? ` (top-k ${opts.topK})` : ""}`);
+  console.log(`Docs: ${opts.docsDir}`);
+  console.log(`Docs corpus hash: ${docsCorpusHash}`);
   console.log(`Planned calls: ${plannedCalls} (${tasks.length} tasks × ${opts.runs} runs)`);
   console.log(`Delay between calls (--delay-ms): ${opts.dryRun ? 0 : opts.delayMs}ms`);
   console.log(`Estimated tokens: ~${estIn} input / ~${estOut} output`);
@@ -280,7 +317,13 @@ async function main(): Promise<void> {
       }
       callIndex++;
 
-      const user = buildUserMessage(task, docsCorpus);
+      const { userMessage: user, retrieved, contextChars } = buildContextUserMessage(task, {
+        mode: opts.context,
+        docsCorpus,
+        pages: docsPages,
+        topK: opts.topK,
+      });
+
       let outcome: AttemptOutcome;
       let rawText = "";
       let failureReason: string | null = null;
@@ -348,6 +391,12 @@ async function main(): Promise<void> {
         costUsd: missingPrice ? null : usd,
         systemPromptHash,
         retries,
+        contextMode: opts.context,
+        topK: opts.context === "rag" ? opts.topK : null,
+        docsPath: opts.docsDir,
+        docsCorpusHash,
+        retrieved,
+        contextChars,
       };
       attempts.push(record);
       await writeRawAttempt(rawDir, record, { stub, secrets });
@@ -361,10 +410,7 @@ async function main(): Promise<void> {
       consecutiveErrors = nextConsecutiveErrors(consecutiveErrors, outcome);
       if (consecutiveErrors >= CIRCUIT_BREAKER_LIMIT) {
         stoppedEarly = true;
-        safeLog(
-          `Circuit breaker: ${INCOMPLETE_BANNER}`,
-          secrets,
-        );
+        safeLog(`Circuit breaker: ${INCOMPLETE_BANNER}`, secrets);
         break outer;
       }
     }
@@ -401,6 +447,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error(err instanceof Error ? err.message : err);
+  console.error(err instanceof Error ? err.message : String(err));
   process.exit(1);
 });

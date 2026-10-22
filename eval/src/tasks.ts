@@ -37,8 +37,17 @@ export function parseTaskIds(raw: string): string[] {
     .filter(Boolean);
 }
 
+/** Live scored labels that must use the full task suite (refuse --tasks). */
+const FULL_SUITE_LABELS = new Set([
+  "baseline",
+  "improved",
+  "v1-rag",
+  "v2-rag",
+  "v2-full",
+]);
+
 /**
- * Live baseline/improved must run all tasks (refuse --tasks).
+ * Live baseline / improved / v*-rag / v2-full must run all tasks (refuse --tasks).
  * Otherwise filter to the requested ids (order preserved from file).
  */
 export function selectTasks(
@@ -48,7 +57,7 @@ export function selectTasks(
   const ids = options.taskIds;
   if (
     !options.dryRun &&
-    (options.label === "baseline" || options.label === "improved") &&
+    FULL_SUITE_LABELS.has(options.label) &&
     ids != null &&
     ids.length > 0
   ) {

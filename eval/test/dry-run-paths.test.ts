@@ -29,6 +29,12 @@ const sampleAttempt = (): AttemptRecord => ({
   thinkingTokens: null,
   costUsd: 0,
   systemPromptHash: "h",
+  contextMode: "full" as const,
+  topK: null,
+  docsPath: "/synth",
+  docsCorpusHash: "h",
+  retrieved: [],
+  contextChars: 0,
   retries: [],
 });
 
@@ -68,6 +74,10 @@ describe("dry-run vs real result paths", () => {
         pricingSourceUrl: "https://example.com",
         pricingLookupDate: "2026-10-22",
         runsPerTask: 1,
+        contextMode: "full",
+        topK: null,
+        docsPath: "/synth",
+        docsCorpusHash: "h",
         tasks: [],
         overallPasses: 0,
         overallScoredRuns: 0,

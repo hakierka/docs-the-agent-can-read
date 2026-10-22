@@ -4,6 +4,12 @@ import type { RetryRecord } from "./provider.js";
 
 export type AttemptOutcome = "pass" | "fail" | "error";
 
+export type RetrievedHitRecord = {
+  chunkId: string;
+  score: number;
+  prefix: string;
+};
+
 export type AttemptRecord = {
   taskId: string;
   run: number;
@@ -24,6 +30,13 @@ export type AttemptRecord = {
   costUsd: number | null;
   systemPromptHash: string;
   retries: RetryRecord[];
+  contextMode: "full" | "rag";
+  topK: number | null;
+  docsPath: string;
+  docsCorpusHash: string;
+  retrieved: RetrievedHitRecord[];
+  /** Characters in the documentation block of the user message. */
+  contextChars: number;
 };
 
 export type TaskSummary = {
@@ -48,6 +61,10 @@ export type AggregateResult = {
   pricingSourceUrl: string;
   pricingLookupDate: string;
   runsPerTask: number;
+  contextMode: "full" | "rag";
+  topK: number | null;
+  docsPath: string;
+  docsCorpusHash: string;
   tasks: TaskSummary[];
   overallPasses: number;
   overallScoredRuns: number;
@@ -238,6 +255,7 @@ export function buildAggregate(
     ? costs.reduce((s, c) => s + (c as number), 0)
     : null;
 
+  const first = attempts[0];
   return {
     label,
     provider,
@@ -249,6 +267,10 @@ export function buildAggregate(
     pricingSourceUrl,
     pricingLookupDate,
     runsPerTask,
+    contextMode: first?.contextMode ?? "full",
+    topK: first?.topK ?? null,
+    docsPath: first?.docsPath ?? "",
+    docsCorpusHash: first?.docsCorpusHash ?? "",
     tasks,
     overallPasses,
     overallScoredRuns,
@@ -277,6 +299,9 @@ function renderMarkdown(a: AggregateResult): string {
   lines.push(`- System prompt hash: \`${a.systemPromptHash}\``);
   lines.push(`- Pricing: ${a.pricingSourceUrl} (lookup ${a.pricingLookupDate})`);
   lines.push(`- Runs per task: ${a.runsPerTask}`);
+  lines.push(`- Context: \`${a.contextMode}\`${a.topK != null ? ` (top-k ${a.topK})` : ""}`);
+  lines.push(`- Docs path: \`${a.docsPath}\``);
+  lines.push(`- Docs corpus hash: \`${a.docsCorpusHash}\``);
   lines.push(`- Overall (errors excluded): **${a.overallPassRate}**`);
   lines.push(`- Errors (excluded from pass rate): **${a.overallErrors}**`);
   lines.push(

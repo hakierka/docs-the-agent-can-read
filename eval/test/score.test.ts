@@ -56,6 +56,12 @@ describe("scoring + stub rendering", () => {
         thinkingTokens: null,
         costUsd: 0,
         systemPromptHash: hash,
+        contextMode: "full" as const,
+        topK: null,
+        docsPath: "/synth",
+        docsCorpusHash: "h",
+        retrieved: [],
+        contextChars: 0,
         retries: [],
       });
     }
