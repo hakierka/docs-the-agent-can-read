@@ -3,6 +3,8 @@
 Frozen map of which **v1** rag chunks contain the facts for each eval task.  
 Written from the v1 docs text and the chunker ids below. Not from model output or `results/`.
 
+A set of chunks is sufficient when together they contain every fact the correct answer depends on. The command name cat-status and the answer format are given by the task and do not count as facts.
+
 ## Metric: retrieved-sufficient
 
 A rag run attempt is **retrieved-sufficient** if, for **at least one** listed alternative for that task, **all** chunk ids in that alternative appear in the retrieved top-k for the attempt.
@@ -12,7 +14,8 @@ A rag run attempt is **retrieved-sufficient** if, for **at least one** listed al
 
 ## v1 chunk id inventory (chunker only; no retriever)
 
-Generated with `loadDocsPages(..., { includeLlms: false })` + `chunkPages` (rag index set).
+Generated with `loadDocsPages(..., { includeLlms: false })` + `chunkPages` (rag index set).  
+Empty `##` / `###` / intro sections produce no chunk (so parent-only headings like Arguments / Flags are absent).
 
 | chunk id | prefix |
 |----------|--------|
@@ -20,10 +23,8 @@ Generated with `loadDocsPages(..., { includeLlms: false })` + `chunkPages` (rag 
 | `install` | Install |
 | `quick-start` | Quick start |
 | `command-reference--synopsis` | Command reference > Synopsis |
-| `command-reference--arguments` | Command reference > Arguments |
 | `command-reference--arguments--code` | Command reference > Arguments > `<code>` |
 | `command-reference--arguments--non-standard-codes` | Command reference > Arguments > Non-standard codes |
-| `command-reference--flags` | Command reference > Flags |
 | `command-reference--flags--json` | Command reference > Flags > `--json` |
 | `command-reference--flags--list-1xx-2xx-3xx-4xx-5xx` | Command reference > Flags > `--list [1xx\|2xx\|3xx\|4xx\|5xx]` |
 | `command-reference--flags--save-path` | Command reference > Flags > `--save <path>` |
@@ -51,11 +52,11 @@ T3: needs [command-reference--synopsis] OR [quick-start AND command-reference--f
 
 T4: needs [quick-start] OR [command-reference--flags--save-path AND command-reference--flags--force]
 
-T5: needs [command-reference--flags--save-path AND command-reference--flags--timeout-ms]
+T5: needs [command-reference--flags--save-path AND command-reference--flags--timeout-ms] OR [quick-start AND command-reference--flags--timeout-ms] OR [command-reference--synopsis]
 
-T6: needs [troubleshooting--negative-numbers-look-like-options]
+T6: needs [troubleshooting--negative-numbers-look-like-options] OR [command-reference--arguments--code]
 
-T7: needs [troubleshooting--real-http-status-with-no-cat-image] OR [quick-start]
+T7: needs [troubleshooting--real-http-status-with-no-cat-image] OR [quick-start] OR [command-reference--exit-codes]
 
 T8: needs [command-reference--flags--timeout-ms AND command-reference--exit-codes]
 

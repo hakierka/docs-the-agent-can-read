@@ -48,8 +48,9 @@ function fenceToggle(line: string, openMarker: string | null): string | null {
 /**
  * Split one page by ## / ### outside fenced code blocks.
  * - Headings inside ``` / ~~~ fences are ignored.
- * - No ##/### → one chunk (entire body under page title).
- * - Content before first heading → chunk for the page title.
+ * - No ##/### → one chunk (entire body under page title), or none if empty.
+ * - Content before first heading → page-title chunk only when non-empty after trim.
+ * - ## / ### with no body text (empty after trim) produce **no** chunk.
  */
 export function chunkPage(page: DocPage): DocChunk[] {
   const pageId = pageSlug(page.file);
@@ -72,6 +73,7 @@ export function chunkPage(page: DocPage): DocChunk[] {
 
   if (!sawHeading) {
     const text = page.body.trim();
+    if (!text) return [];
     return [
       {
         id: pageId,
@@ -121,7 +123,9 @@ export function chunkPage(page: DocPage): DocChunk[] {
       });
       continue;
     }
+    // Keep h2 path for ### children even when the ## body itself is empty.
     if (seg.level === 2) h2ForPath = seg.heading;
+    if (!body) continue;
     const headingPath =
       seg.level === 2
         ? seg.heading

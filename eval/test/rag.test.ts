@@ -103,6 +103,36 @@ Outside the fence.
     expect(chunks.some((c) => c.text.includes("## not a heading"))).toBe(true);
   });
 
+  it("drops empty ## / ### / intro chunks", () => {
+    const page: DocPage = {
+      file: "empty-secs.md",
+      title: "EmptySecs",
+      body: `## ParentOnly
+
+### ChildWithText
+
+child body here
+
+## WithText
+
+parent body
+
+### EmptyChild
+
+## TrailingEmpty
+`,
+    };
+    const chunks = chunkPage(page);
+    const paths = chunks.map((c) => c.headingPath);
+    // ## ParentOnly has no body of its own → no chunk for ParentOnly alone
+    expect(paths).not.toContain("ParentOnly");
+    expect(paths).toContain("ParentOnly > ChildWithText");
+    expect(paths).toContain("WithText");
+    expect(paths).not.toContain("WithText > EmptyChild");
+    expect(paths).not.toContain("TrailingEmpty");
+    expect(chunks.every((c) => c.text.trim().length > 0)).toBe(true);
+  });
+
   it("uniquifies duplicate chunk ids with -2, -3", () => {
     const a: DocPage = {
       file: "dup.md",
