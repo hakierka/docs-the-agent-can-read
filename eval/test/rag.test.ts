@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { createHash } from "node:crypto";
+import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { chunkPage, chunkPages, uniquifyChunkIds, type DocPage } from "../src/chunk.js";
@@ -17,13 +19,36 @@ import {
   validateContextFlags,
 } from "../src/context.js";
 import { buildUserMessage, loadSystemPrompt } from "../src/model.js";
-import { hashDocsSources, loadDocsCorpus, loadDocsPages } from "../src/docs.js";
+import {
+  V1_FULL_CORPUS_CHARS,
+  V1_FULL_CORPUS_SHA256,
+  defaultDocsContentDir,
+  hashDocsSources,
+  loadDocsCorpus,
+  loadDocsPages,
+  parseLlmsPageLinks,
+} from "../src/docs.js";
 import { selectTasks, type Task } from "../src/tasks.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SYNTH = join(__dirname, "fixtures", "synth-content");
 const REPO_ROOT = join(__dirname, "..", "..");
 const EVAL_ROOT = join(__dirname, "..");
+const V1_DOCS = defaultDocsContentDir(REPO_ROOT);
+const V2_DOCS = join(REPO_ROOT, "docs-v2");
+
+function parseNeededChunkIds(md: string): string[] {
+  return [...md.matchAll(/^\| `([^`]+)` \|/gm)].map((m) => m[1]!);
+}
+
+function setDiff(a: string[], b: string[]): { onlyA: string[]; onlyB: string[] } {
+  const A = new Set(a);
+  const B = new Set(b);
+  return {
+    onlyA: [...A].filter((x) => !B.has(x)).sort(),
+    onlyB: [...B].filter((x) => !A.has(x)).sort(),
+  };
+}
 
 const alpha: DocPage = {
   file: "command-reference.md",
@@ -125,18 +150,6 @@ Outside the fence.
     expect(chunks.find((c) => c.headingPath === "Real")!.text).toMatch(/Outside the fence/);
     // Fenced fake heading text stays inside the prior (preamble-merged) chunk body.
     expect(chunks.some((c) => c.text.includes("## not a heading"))).toBe(true);
-  });
-
-  it("v1 docs chunk id inventory matches needed-chunks.md exactly", async () => {
-    const docsDir = join(REPO_ROOT, "docs", "src", "content", "docs");
-    const pages = await loadDocsPages(docsDir, join(REPO_ROOT, "docs"), {
-      includeLlms: false,
-    });
-    const ids = chunkPages(pages).map((c) => c.id);
-    const md = await readFile(join(EVAL_ROOT, "needed-chunks.md"), "utf8");
-    const listed = [...md.matchAll(/^\| `([^`]+)` \|/gm)].map((m) => m[1]!);
-    expect(listed.length).toBeGreaterThan(0);
-    expect(ids).toEqual(listed);
   });
 
   it("drops empty ## / ### sections (no orphan preamble chunk when a section exists)", () => {
@@ -290,6 +303,93 @@ describe("context assembly + full-mode unchanged", () => {
     // Synth fixture has no llms.txt — just ensure the option path works.
     expect(fullPages.length).toBeGreaterThanOrEqual(ragPages.length);
     void loadDocsCorpus;
+  });
+});
+
+describe("real docs loader (v1 + docs-v2; no retriever)", () => {
+  it("v1 full-mode corpus string matches golden SHA-256 and length", async () => {
+    const corpus = await loadDocsCorpus(V1_DOCS, join(REPO_ROOT, "docs"));
+    const hash = createHash("sha256").update(corpus, "utf8").digest("hex");
+    expect(hash).toBe(V1_FULL_CORPUS_SHA256);
+    expect(corpus.length).toBe(V1_FULL_CORPUS_CHARS);
+  });
+
+  it("v1 rag chunk ids match needed-chunks.md exactly (22 ids)", async () => {
+    const pages = await loadDocsPages(V1_DOCS, join(REPO_ROOT, "docs"), {
+      includeLlms: false,
+    });
+    const ids = chunkPages(pages).map((c) => c.id);
+    const listed = parseNeededChunkIds(
+      await readFile(join(EVAL_ROOT, "needed-chunks.md"), "utf8"),
+    );
+    expect(listed).toHaveLength(22);
+    expect(ids).toEqual(listed);
+  });
+
+  it("docs-v2 rag chunk ids match needed-chunks-v2.md as a set (40 ids)", async () => {
+    // Relative --docs path as used from eval/
+    const viaRelative = resolve(EVAL_ROOT, "../docs-v2");
+    expect(viaRelative).toBe(V2_DOCS);
+    const pages = await loadDocsPages(viaRelative, viaRelative, {
+      includeLlms: false,
+    });
+    expect(pages.every((p) => p.file !== "llms.txt")).toBe(true);
+    const ids = chunkPages(pages).map((c) => c.id);
+    const listed = parseNeededChunkIds(
+      await readFile(join(EVAL_ROOT, "needed-chunks-v2.md"), "utf8"),
+    );
+    expect(listed).toHaveLength(40);
+    const { onlyA, onlyB } = setDiff(ids, listed);
+    if (onlyA.length || onlyB.length) {
+      throw new Error(
+        `chunk id set mismatch:\n  only in loader: ${JSON.stringify(onlyA)}\n  only in needed-chunks-v2.md: ${JSON.stringify(onlyB)}`,
+      );
+    }
+    expect(new Set(ids).size).toBe(40);
+  });
+
+  it("v2 full corpus starts with llms.txt and includes every llms-linked page", async () => {
+    const llms = await readFile(join(V2_DOCS, "llms.txt"), "utf8");
+    const links = parseLlmsPageLinks(llms);
+    expect(links.length).toBeGreaterThan(0);
+    const pages = await loadDocsPages(V2_DOCS, V2_DOCS, { includeLlms: true });
+    expect(pages[0]!.file).toBe("llms.txt");
+    const files = pages.map((p) => p.file);
+    expect(files.slice(1)).toEqual(links);
+    const corpus = await loadDocsCorpus(V2_DOCS, V2_DOCS);
+    expect(corpus.startsWith("# llms.txt\n")).toBe(true);
+    for (const file of links) {
+      expect(pages.some((p) => p.file === file)).toBe(true);
+    }
+  });
+
+  it("errors when llms.txt link is broken or a .md file is unlisted", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "docs-llms-"));
+    try {
+      await writeFile(
+        join(dir, "llms.txt"),
+        "# t\n\n- [A](a.md)\n- [Missing](nope.md)\n",
+        "utf8",
+      );
+      await writeFile(join(dir, "a.md"), "---\ntitle: A\n---\n\n## H\n\nbody\n", "utf8");
+      await expect(loadDocsPages(dir, dir, { includeLlms: false })).rejects.toThrow(
+        /does not resolve/,
+      );
+
+      const dir2 = await mkdtemp(join(tmpdir(), "docs-llms-unlist-"));
+      try {
+        await writeFile(join(dir2, "llms.txt"), "# t\n\n- [A](a.md)\n", "utf8");
+        await writeFile(join(dir2, "a.md"), "---\ntitle: A\n---\n\n## H\n\nx\n", "utf8");
+        await writeFile(join(dir2, "orphan.md"), "---\ntitle: O\n---\n\n## H\n\ny\n", "utf8");
+        await expect(loadDocsPages(dir2, dir2, { includeLlms: true })).rejects.toThrow(
+          /not listed in llms\.txt/,
+        );
+      } finally {
+        await rm(dir2, { recursive: true, force: true });
+      }
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 
