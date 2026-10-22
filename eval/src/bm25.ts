@@ -4,7 +4,7 @@ import type { DocChunk } from "./chunk.js";
 export const BM25_K1 = 1.5;
 export const BM25_B = 0.75;
 
-/** Fixed stopword list — do not expand casually. */
+/** Ordinary function words only — not content tokens like "json". */
 export const STOPWORDS = new Set([
   "a",
   "an",
@@ -34,9 +34,6 @@ export const STOPWORDS = new Set([
   "does",
   "can",
   "only",
-  "json",
-  "reply",
-  "example",
 ]);
 
 const QUERY_CUT = "Reply with JSON only";
@@ -89,6 +86,11 @@ export type Bm25Index = {
   N: number;
 };
 
+/**
+ * Index title + heading path + section text only (via chunk.prefix + chunk.text).
+ * Frontmatter descriptions and llms.txt are never present on rag chunks
+ * (see loadDocsPages includeLlms: false and stripFrontmatter).
+ */
 export function buildBm25Index(chunks: DocChunk[]): Bm25Index {
   const docs: IndexedDoc[] = chunks.map((chunk, order) => {
     const tokens = tokenize(`${chunk.prefix}\n${chunk.text}`);
@@ -117,7 +119,7 @@ export function scoreBm25(index: Bm25Index, queryTokens: string[]): RankedChunk[
 
   const ranked: RankedChunk[] = index.docs.map((d) => {
     let score = 0;
-    for (const [term, _qf] of qtf) {
+    for (const [term] of qtf) {
       const f = d.tf.get(term) ?? 0;
       if (f === 0) continue;
       const n = index.df.get(term) ?? 0;

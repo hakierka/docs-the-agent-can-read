@@ -249,7 +249,10 @@ async function main(): Promise<void> {
   );
   const docsRoot = join(REPO_ROOT, "docs");
   const docsCorpus = await loadDocsCorpus(opts.docsDir, docsRoot);
-  const docsPages = await loadDocsPages(opts.docsDir, docsRoot);
+  // Rag: no llms.txt in the index. Full mode still uses docsCorpus (includes llms.txt).
+  const docsPages = await loadDocsPages(opts.docsDir, docsRoot, {
+    includeLlms: opts.context !== "rag",
+  });
   const docsCorpusHash = await hashDocsSources(opts.docsDir, docsRoot);
 
   const approxContext =

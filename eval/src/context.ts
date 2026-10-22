@@ -35,6 +35,8 @@ export function buildContextUserMessage(
     };
   }
 
+  // Rag pages must already exclude llms.txt (loadDocsPages includeLlms: false).
+  // Indexed fields are title + heading path + section text only (see bm25.buildBm25Index).
   const chunks = chunkPages(options.pages);
   const ranked = retrieveTopK(chunks, task.prompt, options.topK);
   return assembleRagUserMessage(task, ranked);

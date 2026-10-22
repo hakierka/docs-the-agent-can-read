@@ -34,6 +34,15 @@ export type LoadedDocFile = {
   raw: string;
 };
 
+export type LoadPagesOptions = {
+  /**
+   * When true (default), append llms.txt if present.
+   * Rag mode must pass false: llms.txt is full-mode only and is not BM25-indexed.
+   * Frontmatter `description` is never loaded (stripFrontmatter keeps title + body only).
+   */
+  includeLlms?: boolean;
+};
+
 /**
  * Load ordered doc pages (same sources as full-mode corpus).
  * Does not concatenate — use loadDocsCorpus for the byte-stable full string.
@@ -41,7 +50,9 @@ export type LoadedDocFile = {
 export async function loadDocsPages(
   docsContentDir: string,
   docsRoot?: string,
+  options: LoadPagesOptions = {},
 ): Promise<DocPage[]> {
+  const includeLlms = options.includeLlms !== false;
   const pages: DocPage[] = [];
 
   for (const file of DOCS_PAGE_ORDER) {
@@ -52,12 +63,17 @@ export async function loadDocsPages(
     } catch {
       continue;
     }
+    // title only from frontmatter; description and other FM fields are dropped.
     const { title, body } = stripFrontmatter(raw);
     pages.push({
       file,
       title: title || file,
       body: body.trim(),
     });
+  }
+
+  if (!includeLlms) {
+    return pages;
   }
 
   const root = docsRoot ?? join(docsContentDir, "..", "..", "..");
@@ -93,7 +109,7 @@ export async function loadDocsPages(
  * Byte-stable: same inputs → same corpus string (full mode depends on this).
  */
 export async function loadDocsCorpus(docsContentDir: string, docsRoot?: string): Promise<string> {
-  const pages = await loadDocsPages(docsContentDir, docsRoot);
+  const pages = await loadDocsPages(docsContentDir, docsRoot, { includeLlms: true });
   const parts = pages.map((p) => `# ${p.title}\n\n${p.body}\n`);
   return parts.join("\n---\n\n");
 }

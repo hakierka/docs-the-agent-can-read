@@ -19,6 +19,7 @@ export type DocChunk = {
 };
 
 const HEADING_RE = /^(#{2,3})\s+(.+?)\s*$/;
+const FENCE_OPEN_RE = /^(```|~~~)/;
 
 export function slugify(input: string): string {
   return input
@@ -33,17 +34,43 @@ export function pageSlug(file: string): string {
   return slugify(file.replace(/\.(md|mdx)$/i, ""));
 }
 
+/** True when line opens or closes a ``` / ~~~ fence (marker from opener). */
+function fenceToggle(line: string, openMarker: string | null): string | null {
+  const m = FENCE_OPEN_RE.exec(line);
+  if (!m) return openMarker;
+  const marker = m[1]!;
+  if (openMarker === null) return marker;
+  // Closer: same fence character sequence at line start.
+  if (line.startsWith(openMarker)) return null;
+  return openMarker;
+}
+
 /**
- * Split one page by ## / ###.
+ * Split one page by ## / ### outside fenced code blocks.
+ * - Headings inside ``` / ~~~ fences are ignored.
  * - No ##/### → one chunk (entire body under page title).
  * - Content before first heading → chunk for the page title.
  */
 export function chunkPage(page: DocPage): DocChunk[] {
   const pageId = pageSlug(page.file);
   const lines = page.body.replace(/\r\n/g, "\n").split("\n");
-  const hasHeading = lines.some((l) => HEADING_RE.test(l));
 
-  if (!hasHeading) {
+  let fence: string | null = null;
+  let sawHeading = false;
+  for (const l of lines) {
+    const before = fence;
+    fence = fenceToggle(l, fence);
+    if (before !== null || (before === null && fence !== null)) {
+      // opener, inside, or closer — not a real heading line
+      continue;
+    }
+    if (HEADING_RE.test(l)) {
+      sawHeading = true;
+      break;
+    }
+  }
+
+  if (!sawHeading) {
     const text = page.body.trim();
     return [
       {
@@ -58,14 +85,20 @@ export function chunkPage(page: DocPage): DocChunk[] {
 
   type Seg = { level: number; heading: string; lines: string[] };
   const segs: Seg[] = [{ level: 0, heading: "", lines: [] }];
-  let h2 = "";
+  fence = null;
 
   for (const line of lines) {
+    const before = fence;
+    fence = fenceToggle(line, fence);
+    if (before !== null || (before === null && fence !== null)) {
+      // Inside fence (including opener/closer lines): never treat as heading.
+      segs[segs.length - 1]!.lines.push(line);
+      continue;
+    }
     const m = HEADING_RE.exec(line);
     if (m) {
       const level = m[1]!.length;
       const heading = m[2]!.trim();
-      if (level === 2) h2 = heading;
       segs.push({ level, heading, lines: [] });
       continue;
     }
@@ -111,6 +144,17 @@ export function chunkPage(page: DocPage): DocChunk[] {
   return chunks;
 }
 
+/** First id unchanged; later duplicates become id-2, id-3, … in document order. */
+export function uniquifyChunkIds(chunks: DocChunk[]): DocChunk[] {
+  const counts = new Map<string, number>();
+  return chunks.map((c) => {
+    const n = (counts.get(c.id) ?? 0) + 1;
+    counts.set(c.id, n);
+    if (n === 1) return c;
+    return { ...c, id: `${c.id}-${n}` };
+  });
+}
+
 export function chunkPages(pages: DocPage[]): DocChunk[] {
-  return pages.flatMap(chunkPage);
+  return uniquifyChunkIds(pages.flatMap(chunkPage));
 }

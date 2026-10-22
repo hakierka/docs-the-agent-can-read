@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { chunkPage, chunkPages, type DocPage } from "../src/chunk.js";
+import { chunkPage, chunkPages, uniquifyChunkIds, type DocPage } from "../src/chunk.js";
 import {
   buildBm25Index,
   cleanQuery,
@@ -73,6 +72,57 @@ describe("chunker (synthetic)", () => {
     const b = chunkPages([alpha, beta]).map((c) => c.id);
     expect(a).toEqual(b);
   });
+
+  it("ignores ## / ### inside fenced code blocks", () => {
+    const page: DocPage = {
+      file: "fenced.md",
+      title: "Fenced",
+      body: `Before.
+
+\`\`\`bash
+## not a heading
+echo hi
+\`\`\`
+
+## Real
+
+Outside the fence.
+
+~~~
+### also not a heading
+~~~
+`,
+    };
+    const chunks = chunkPage(page);
+    const ids = chunks.map((c) => c.id);
+    expect(ids).not.toContain("fenced--not-a-heading");
+    expect(ids.some((id) => id.includes("also-not"))).toBe(false);
+    expect(chunks.some((c) => c.headingPath === "Real")).toBe(true);
+    expect(chunks.find((c) => c.headingPath === "Real")!.text).toMatch(/Outside the fence/);
+    // Fenced fake heading text stays inside the intro (or prior) chunk body.
+    expect(chunks.some((c) => c.text.includes("## not a heading"))).toBe(true);
+  });
+
+  it("uniquifies duplicate chunk ids with -2, -3", () => {
+    const a: DocPage = {
+      file: "dup.md",
+      title: "Dup",
+      body: `## Same\n\none\n\n## Same\n\ntwo\n\n## Same\n\nthree\n`,
+    };
+    const chunks = chunkPages([a]);
+    const same = chunks.filter((c) => c.headingPath === "Same");
+    expect(same.map((c) => c.id)).toEqual([
+      "dup--same",
+      "dup--same-2",
+      "dup--same-3",
+    ]);
+    // Direct uniquify helper
+    const u = uniquifyChunkIds([
+      { id: "x", pageTitle: "t", headingPath: "", prefix: "t", text: "a" },
+      { id: "x", pageTitle: "t", headingPath: "", prefix: "t", text: "b" },
+    ]);
+    expect(u.map((c) => c.id)).toEqual(["x", "x-2"]);
+  });
 });
 
 describe("tokenizer + BM25 (synthetic)", () => {
@@ -81,6 +131,13 @@ describe("tokenizer + BM25 (synthetic)", () => {
     expect(toks).toContain("--timeout");
     expect(toks).toContain("cat-status");
     expect(toks).toContain("2000");
+  });
+
+  it('keeps json from task-like query "print the result as JSON"', () => {
+    const toks = tokenize("print the result as JSON");
+    expect(toks).toContain("json");
+    expect(toks).toContain("print");
+    expect(toks).toContain("result");
   });
 
   it("cleanQuery truncates at Reply with JSON only", () => {
@@ -155,6 +212,18 @@ describe("context assembly + full-mode unchanged", () => {
     const h2 = await hashDocsSources(SYNTH, join(SYNTH, ".."));
     expect(h1).toBe(h2);
     expect(h1).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("rag page load excludes llms.txt; full corpus may include it", async () => {
+    const ragPages = await loadDocsPages(SYNTH, join(SYNTH, ".."), {
+      includeLlms: false,
+    });
+    expect(ragPages.every((p) => p.file !== "llms.txt")).toBe(true);
+    // Full-mode helper still requests includeLlms true by default.
+    const fullPages = await loadDocsPages(SYNTH, join(SYNTH, ".."));
+    // Synth fixture has no llms.txt — just ensure the option path works.
+    expect(fullPages.length).toBeGreaterThanOrEqual(ragPages.length);
+    void loadDocsCorpus;
   });
 });
 
