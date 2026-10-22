@@ -1,0 +1,14 @@
+# cat-status
+
+cat-status is a Node.js CLI that maps known HTTP status codes to https://http.cat image URLs. It looks up codes from a built-in table, can list supported codes (including non-standard product codes), print JSON, and optionally download an image with --save. Only --save uses the network. Unknown or unsupported codes fail with a clear stderr line and a non-zero exit code.
+
+- [What cat-status does](index.md): Overview of the tool, what it prints, and what it will not do.
+- [Install cat-status](install.md): Build and run the CLI from a local checkout on Node.js 22+.
+- [Look up a status code URL](lookup.md): Print the http.cat URL for one known status code.
+- [Print JSON for a status code](json.md): Print machine-readable JSON for one known status code.
+- [List supported status codes](list.md): Print every supported code, or filter by class, in text or JSON.
+- [Save an image to a file](save.md): Download a http.cat image with --save, --force, and --timeout.
+- [Understand non-standard codes](non-standard.md): Which codes are non-standard, how --list labels them, and how lookup treats them.
+- [Exit codes and errors](errors.md): Every exit code and stderr message the CLI can produce, with cause and fix.
+- [Flag reference](flags.md): Complete flag table with defaults, valid combinations, and effects.
+- [Changelog](changelog.md): Notable changes for version 1.0.0.
