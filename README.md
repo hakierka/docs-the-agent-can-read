@@ -2,6 +2,8 @@
 
 A small experiment on writing documentation that AI assistants can use.
 
+Write-up: [My docs made the AI agent worse. Then I fixed them.](https://medium.com/@amywal/my-docs-made-the-ai-agent-worse-then-i-fixed-them-f4a713cb8ade)
+
 ## Why this exists
 
 More and more, AI assistants read documentation as well as people. They often do not read the whole site. They search it, get a few small pieces, and answer from those pieces.
